@@ -281,7 +281,9 @@ func evalRuntime(ticks int64) string {
 		if hours > 0 {
 			s = strconv.Itoa(int(hours)) + "h"
 		}
-		s = s + strconv.Itoa(int(minutes)) + "m"
+		if minutes > 0 {
+			s = s + strconv.Itoa(int(minutes)) + "m"
+		}
 	}
 	return s
 }
