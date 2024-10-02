@@ -219,6 +219,7 @@ func UserGetViews(id string, accesstoken string) ([]UserView, error) {
 					Id:             item.Id,
 				}
 				userViews = append(userViews, v)
+				break
 			}
 		}
 	}
