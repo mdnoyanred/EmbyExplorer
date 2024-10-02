@@ -266,8 +266,6 @@ func UserGetItenms(id string, collectionid string, collectiontype string, access
 	return result, nil
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 func AuthenticateUserInt() error {
 	return AuthenticateUserByCredentials(embyPreferences.EmbyUser, embyPreferences.EmbyPassword)
 }
@@ -279,8 +277,6 @@ func UserGetViewsInt() ([]UserView, error) {
 func UserGetItenmsInt(collectionid string, collectiontype string) ([]BaseItemDto, error) {
 	return UserGetItenms(EmbySession.User.Id, collectionid, collectiontype, EmbySession.AccessToken)
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
 
 func createPair(key string, value string) string {
 	const qu = `"`
