@@ -13,12 +13,13 @@ import (
 	"github.com/richardwilkes/unison"
 	"github.com/richardwilkes/unison/enums/align"
 	"github.com/richardwilkes/unison/enums/behavior"
+	"github.com/richardwilkes/unison/enums/paintstyle"
 )
 
 const (
-	toolbuttonX              = 16
-	toolbuttonY              = 16
-	toolbarFontSize  float32 = 8
+	toolbuttonX              = 20
+	toolbuttonY              = 20
+	toolbarFontSize  float32 = 9
 	viewsPopupWidth          = 150
 	viewsPopupHeight         = 20
 )
@@ -134,7 +135,42 @@ func createTablePanel() *unison.Panel {
 		HGrab:  true,
 		VGrab:  true,
 	})
+	logo := createEmbyLogo()
+	if logo != nil {
+		mainContent.AddChild(logo)
+	}
 	return mainContent.AsPanel()
+}
+
+func createEmbyLogo() *unison.Panel {
+	var svg *unison.SVG
+	var err error
+	if svg, err = getEmbyLogo(); err != nil {
+		return nil
+	}
+	panel := unison.NewPanel()
+	panel.SetLayoutData(&unison.FlexLayoutData{
+		MinSize: unison.NewSize(50, 50),
+		HSpan:   1,
+		VSpan:   1,
+		HAlign:  align.Fill,
+		VAlign:  align.Fill,
+		HGrab:   true,
+		VGrab:   true,
+	})
+	panel.DrawCallback = func(gc *unison.Canvas, dirty unison.Rect) {
+		gc.DrawRect(dirty, unison.ThemeSurface.Light.Paint(gc, dirty, paintstyle.Fill))
+		svg.DrawInRectPreservingAspectRatio(gc, panel.ContentRect(false), nil, nil)
+	}
+	return panel
+}
+
+func getEmbyLogo() (*unison.SVG, error) {
+	logo, err := unison.NewSVGFromContentString(assets.EmbyLogo)
+	if err != nil {
+		return nil, err
+	}
+	return logo, nil
 }
 
 func NewMovieTable(content *unison.Panel, movieData []api.MovieData) {

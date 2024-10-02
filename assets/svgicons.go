@@ -13,3 +13,6 @@ var IconPreferences string
 
 //go:embed fetch.svg
 var IconFetch string
+
+//go:embed emby.svg
+var EmbyLogo string
