@@ -1,0 +1,99 @@
+// (w) 2024 by Jan Buchholz. No rights reserved.
+// UI MainWindow, using Unison library (c) Richard A. Wilkes
+// https://github.com/richardwilkes/unison
+
+package ui
+
+import (
+	"Emby_Explorer/api"
+	"Emby_Explorer/assets"
+	"Emby_Explorer/settings"
+	"github.com/richardwilkes/unison"
+)
+
+const (
+	wndMinWidth  float32 = 640
+	wndMinHeight float32 = 480
+)
+
+var mainWindow *unison.Window
+
+func NewMainWindow() error {
+	var err error
+	mainWindow, err = unison.NewWindow("")
+	if err != nil {
+		return err
+	}
+	mainWindow.SetTitle(assets.AppName)
+	content := mainWindow.Content()
+	content.SetBorder(unison.NewEmptyBorder(unison.NewUniformInsets(5)))
+	content.SetLayout(&unison.FlexLayout{
+		Columns:  1,
+		HSpacing: 1,
+		VSpacing: 5,
+	})
+	content.AddChild(createToolbarPanel())
+	content.AddChild(createTablePanel())
+	installDefaultMenus(mainWindow)
+	installCallbacks()
+	_ = LoadPreferences()
+	prefs := settings.GetPreferences()
+	rect := prefs.WindowRect
+	if rect.Width < wndMinWidth {
+		rect.Width = wndMinWidth
+	}
+	if rect.Height < wndMinHeight {
+		rect.Height = wndMinHeight
+	}
+	dispRect := unison.PrimaryDisplay().Usable
+	if rect.X == 0 || rect.X > dispRect.Width-rect.Width {
+		if dispRect.Width > rect.Width {
+			rect.X = (dispRect.Width - rect.Width) / 2
+		}
+	}
+	if rect.Y == 0 || rect.Y > dispRect.Height-rect.Height {
+		if dispRect.Height > rect.Height {
+			rect.Y = (dispRect.Height - rect.Height) / 2
+		}
+	}
+	mainWindow.SetFrameRect(rect)
+	v := settings.Valid()
+	if v {
+		api.InitApiPreferences(prefs.EmbySecure, prefs.EmbyServer, prefs.EmbyPort, prefs.EmbyUser, prefs.EmbyPassword)
+	}
+	setFunctions(true, v, false)
+	mainWindow.ToFront()
+	return nil
+}
+
+func installDefaultMenus(wnd *unison.Window) {
+	unison.DefaultMenuFactory().BarForWindow(wnd, func(m unison.Menu) {
+		unison.InsertStdMenus(m, AboutDialog, PreferencesDialogFromMenu, nil)
+	})
+}
+
+func installCallbacks() {
+	mainWindow.AllowCloseCallback = func() bool {
+		return mainWindowAllowClose()
+	}
+	mainWindow.WillCloseCallback = func() {
+		mainWindowWillClose()
+	}
+}
+
+func mainWindowAllowClose() bool {
+	return true
+}
+
+func mainWindowWillClose() {
+	rect := mainWindow.FrameRect()
+	prefs := settings.GetPreferences()
+	prefs.WindowRect = rect
+	settings.SetPreferences(prefs)
+	_ = SavePreferences()
+}
+
+func AllowQuitCallback() bool {
+	mainWindow.AttemptClose()
+	return true
+}
