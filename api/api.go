@@ -33,13 +33,13 @@ const (
 
 // Fields for auth. request
 const (
-	authType       = "Emby"
-	authHeader     = "Authorization"
-	authKeyUserId  = "UserId"
-	authKeyClient  = "Client"
-	authKeyDevice  = "Device"
-	authKeyeviceId = "DeviceId"
-	authKeyVersion = "Version"
+	authType        = "Emby"
+	authHeader      = "Authorization"
+	authKeyUserId   = "UserId"
+	authKeyClient   = "Client"
+	authKeyDevice   = "Device"
+	authKeyDeviceId = "DeviceId"
+	authKeyVersion  = "Version"
 )
 
 const (
@@ -291,7 +291,7 @@ func createHeader(id string) string {
 	var h string
 	host, _ := os.Hostname()
 	h = authType + " " + createPair(authKeyUserId, id) + ", " + createPair(authKeyClient, "PC") + ", " +
-		createPair(authKeyDevice, runtime.GOOS) + ", " + createPair(authKeyeviceId, host) + ", " +
+		createPair(authKeyDevice, runtime.GOOS) + ", " + createPair(authKeyDeviceId, host) + ", " +
 		createPair(authKeyVersion, "1.0.0.0")
 	return h
 }
