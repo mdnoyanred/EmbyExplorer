@@ -4,6 +4,7 @@ The initial main window:
 <img width="1298" alt="image" src="https://github.com/user-attachments/assets/eaf83c81-1b09-4527-8c2a-1bcee86c9cfe">
 
 Connection settings:
+
 <img width="365" alt="image" src="https://github.com/user-attachments/assets/494370c3-d43c-4aaa-b10f-e1e98ebe5be8">
 
 Example of fetched Home Videos:
