@@ -17,6 +17,7 @@ import (
 type TableDescription struct {
 	NoOfFields int
 	Captions   []string
+	APIFields  string
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -29,6 +30,8 @@ var MovieTableDescription = TableDescription{
 	NoOfFields: 12,
 	Captions: []string{"Title", "Original Title", "Year", "Time", "Actors", "Director", "Studio", "Genre", "Ext.",
 		"Codec", "Resolution", "Path"},
+	APIFields: "Name,OriginalTitle,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container," +
+		"RunTimeTicks,Type_", //no spaces!
 }
 
 type MovieData struct {
@@ -212,8 +215,10 @@ var _ unison.TableRowData[*TVShowRow] = &TVShowRow{}
 var TVShowTable *unison.Table[*TVShowRow]
 var TVShowTableDescription = TableDescription{
 	NoOfFields: 12,
-	Captions: []string{"Series", "Episode", "Season", "Year", "Time", "Actors", "Studio",
-		"Genre", "Ext.", "Codec", "Resolution", "Path"},
+	Captions: []string{"Series", "Episode", "Season", "Year", "Time", "Actors", "Studio", "Genre", "Ext.", "Codec",
+		"Resolution", "Path"},
+	APIFields: "Name,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container,RunTimeTicks," +
+		"SeriesId,SeasonId,Id,ParentId,IndexNumber,Type_", //no spaces!
 }
 
 type TVShowData struct {
@@ -376,6 +381,7 @@ var HomeVideoTable *unison.Table[*HomeVideoRow]
 var HomeVideoTableDescription = TableDescription{
 	NoOfFields: 6,
 	Captions:   []string{"Title", "Time", "Ext.", "Codec", "Resolution", "Path"},
+	APIFields:  "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,Type_", //no spaces!
 }
 
 type HomeVideoData struct {

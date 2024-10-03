@@ -20,36 +20,15 @@ const (
 
 const placeHolder = "-"
 
-var MovieFields = []string{
-	"Name", "OriginalTitle", "MediaSources", "Path", "Genres", "ProductionYear", "People", "Studios",
-	"Width", "Height", "Container", "RunTimeTicks", "Type_",
-}
-
-var TVShowFields = []string{
-	"Name", "MediaSources", "Path", "Genres", "ProductionYear", "People", "Studios",
-	"Width", "Height", "Container", "RunTimeTicks", "SeriesId", "SeasonId", "Id",
-	"ParentId", "IndexNumber", "Type_",
-}
-
-var HomeVideoFields = []string{
-	"Name", "MediaSources", "Path", "Width", "Height", "Container", "RunTimeTicks", "Type_",
-}
-
 func GetFields(collectiontype string) string {
 	var m = ""
 	switch collectiontype {
 	case CollectionMovies:
-		for _, field := range MovieFields {
-			m = commaStringNoSpace(m, field)
-		}
+		m = models.MovieTableDescription.APIFields
 	case CollectionTVShows:
-		for _, field := range TVShowFields {
-			m = commaStringNoSpace(m, field)
-		}
+		m = models.TVShowTableDescription.APIFields
 	case CollectionHomeVideos:
-		for _, field := range HomeVideoFields {
-			m = commaStringNoSpace(m, field)
-		}
+		m = models.HomeVideoTableDescription.APIFields
 	default:
 	}
 	return m
@@ -284,16 +263,6 @@ func commaString(source string, append string) string {
 	s := source
 	if s != "" {
 		s = s + ", " + append
-	} else {
-		s = append
-	}
-	return s
-}
-
-func commaStringNoSpace(source string, append string) string {
-	s := source
-	if s != "" {
-		s = s + "," + append
 	} else {
 		s = append
 	}
