@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	toolbuttonX              = 20
-	toolbuttonY              = 20
+	toolbuttonWidth          = 20
+	toolbuttonHeight         = 20
 	toolbarFontSize  float32 = 9
 	viewsPopupWidth          = 150
 	viewsPopupHeight         = 20
@@ -39,7 +39,7 @@ func newSVGButton(svg *unison.SVG) *unison.Button {
 	btn.HideBase = true
 	btn.Drawable = &unison.DrawableSVG{
 		SVG:  svg,
-		Size: unison.NewSize(toolbuttonX, toolbuttonY),
+		Size: unison.NewSize(toolbuttonWidth, toolbuttonHeight),
 	}
 	btn.Font = unison.LabelFont.Face().Font(toolbarFontSize)
 	return btn
