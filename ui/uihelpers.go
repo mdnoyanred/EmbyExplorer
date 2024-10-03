@@ -1,12 +1,13 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
-// UI, helpers and table panels
+// UI, table panels & utilities
 // Using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
+// ---------------------------------------------------------------------------------------------------------------------
 
 package ui
 
 import (
-	"Emby_Explorer/api"
 	"Emby_Explorer/assets"
 	"Emby_Explorer/models"
 	"github.com/richardwilkes/toolbox/tid"
@@ -30,6 +31,8 @@ var authBtn *unison.Button
 var fetchBtn *unison.Button
 
 var mainContent *unison.Panel
+var logoPanel *unison.Panel
+var tableScrollArea *unison.ScrollPanel
 
 func newSVGButton(svg *unison.SVG) *unison.Button {
 	btn := unison.NewButton()
@@ -135,17 +138,17 @@ func createTablePanel() *unison.Panel {
 		HGrab:  true,
 		VGrab:  true,
 	})
-	logo := createEmbyLogo()
-	if logo != nil {
-		mainContent.AddChild(logo)
+	mainContent.SetBorder(unison.NewDefaultFieldBorder(false))
+	logoPanel = createEmbyLogoPanel()
+	if logoPanel != nil {
+		mainContent.AddChild(logoPanel)
 	}
 	return mainContent.AsPanel()
 }
 
-func createEmbyLogo() *unison.Panel {
-	var svg *unison.SVG
-	var err error
-	if svg, err = getEmbyLogo(); err != nil {
+func createEmbyLogoPanel() *unison.Panel {
+	svg, err := unison.NewSVGFromContentString(assets.EmbyLogo)
+	if err != nil {
 		return nil
 	}
 	panel := unison.NewPanel()
@@ -165,17 +168,16 @@ func createEmbyLogo() *unison.Panel {
 	return panel
 }
 
-func getEmbyLogo() (*unison.SVG, error) {
-	logo, err := unison.NewSVGFromContentString(assets.EmbyLogo)
-	if err != nil {
-		return nil, err
+func setLogoPanel() {
+	if logoPanel != nil {
+		mainContent.RemoveAllChildren()
+		mainContent.AddChild(logoPanel)
 	}
-	return logo, nil
 }
 
-func NewMovieTable(content *unison.Panel, movieData []api.MovieData) {
+func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 	models.MovieTable = unison.NewTable[*models.MovieRow](&unison.SimpleTableModel[*models.MovieRow]{})
-	models.MovieTable.Columns = make([]unison.ColumnInfo, movieNumberOfColumns)
+	models.MovieTable.Columns = make([]unison.ColumnInfo, models.MovieTableDescription.NoOfFields)
 	for i := range models.MovieTable.Columns {
 		models.MovieTable.Columns[i].ID = i
 		models.MovieTable.Columns[i].Minimum = 20
@@ -189,39 +191,39 @@ func NewMovieTable(content *unison.Panel, movieData []api.MovieData) {
 	models.MovieTable.SetRootRows(rows)
 	models.MovieTable.SizeColumnsToFit(true)
 	header := unison.NewTableHeader[*models.MovieRow](models.MovieTable,
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[0], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[1], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[2], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[3], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[4], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[5], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[6], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[7], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[8], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[9], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[10], ""),
-		unison.NewTableColumnHeader[*models.MovieRow](movieCaptions[11], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[0], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[1], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[2], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[3], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[4], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[5], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[6], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[7], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[8], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[9], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[10], ""),
+		unison.NewTableColumnHeader[*models.MovieRow](models.MovieTableDescription.Captions[11], ""),
 	)
 	header.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 	})
-	scrollArea := unison.NewScrollPanel()
-	scrollArea.SetContent(models.MovieTable, behavior.Fill, behavior.Fill)
-	scrollArea.SetLayoutData(&unison.FlexLayoutData{
+	tableScrollArea = unison.NewScrollPanel()
+	tableScrollArea.SetContent(models.MovieTable, behavior.Fill, behavior.Fill)
+	tableScrollArea.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 		VGrab:  true,
 	})
-	scrollArea.SetColumnHeader(header)
-	content.AddChild(scrollArea)
+	tableScrollArea.SetColumnHeader(header)
+	content.AddChild(tableScrollArea)
 }
 
-func NewTVShowTable(content *unison.Panel, tvshowData []api.TVShowData) {
+func newTVShowTable(content *unison.Panel, tvshowData []models.TVShowData) {
 	models.TVShowTable = unison.NewTable[*models.TVShowRow](&unison.SimpleTableModel[*models.TVShowRow]{})
-	models.TVShowTable.Columns = make([]unison.ColumnInfo, tvshowNumberOfColumns)
+	models.TVShowTable.Columns = make([]unison.ColumnInfo, models.TVShowTableDescription.NoOfFields)
 	for i := range models.TVShowTable.Columns {
 		models.TVShowTable.Columns[i].ID = i
 		models.TVShowTable.Columns[i].Minimum = 20
@@ -235,39 +237,39 @@ func NewTVShowTable(content *unison.Panel, tvshowData []api.TVShowData) {
 	models.TVShowTable.SetRootRows(rows)
 	models.TVShowTable.SizeColumnsToFit(true)
 	header := unison.NewTableHeader[*models.TVShowRow](models.TVShowTable,
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[0], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[1], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[2], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[3], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[4], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[5], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[6], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[7], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[8], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[9], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[10], ""),
-		unison.NewTableColumnHeader[*models.TVShowRow](tvshowCaptions[11], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[0], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[1], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[2], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[3], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[4], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[5], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[6], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[7], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[8], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[9], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[10], ""),
+		unison.NewTableColumnHeader[*models.TVShowRow](models.TVShowTableDescription.Captions[11], ""),
 	)
 	header.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 	})
-	scrollArea := unison.NewScrollPanel()
-	scrollArea.SetContent(models.TVShowTable, behavior.Fill, behavior.Fill)
-	scrollArea.SetLayoutData(&unison.FlexLayoutData{
+	tableScrollArea = unison.NewScrollPanel()
+	tableScrollArea.SetContent(models.TVShowTable, behavior.Fill, behavior.Fill)
+	tableScrollArea.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 		VGrab:  true,
 	})
-	scrollArea.SetColumnHeader(header)
-	content.AddChild(scrollArea)
+	tableScrollArea.SetColumnHeader(header)
+	content.AddChild(tableScrollArea)
 }
 
-func NewHomeVideoTable(content *unison.Panel, homevideoData []api.HomeVideoData) {
+func newHomeVideoTable(content *unison.Panel, homevideoData []models.HomeVideoData) {
 	models.HomeVideoTable = unison.NewTable[*models.HomeVideoRow](&unison.SimpleTableModel[*models.HomeVideoRow]{})
-	models.HomeVideoTable.Columns = make([]unison.ColumnInfo, homevideoNumberOfColumns)
+	models.HomeVideoTable.Columns = make([]unison.ColumnInfo, models.HomeVideoTableDescription.NoOfFields)
 	for i := range models.HomeVideoTable.Columns {
 		models.HomeVideoTable.Columns[i].ID = i
 		models.HomeVideoTable.Columns[i].Minimum = 20
@@ -281,26 +283,26 @@ func NewHomeVideoTable(content *unison.Panel, homevideoData []api.HomeVideoData)
 	models.HomeVideoTable.SetRootRows(rows)
 	models.HomeVideoTable.SizeColumnsToFit(true)
 	header := unison.NewTableHeader[*models.HomeVideoRow](models.HomeVideoTable,
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[0], ""),
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[1], ""),
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[2], ""),
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[3], ""),
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[4], ""),
-		unison.NewTableColumnHeader[*models.HomeVideoRow](homevideoCaptions[5], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[0], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[1], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[2], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[3], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[4], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[5], ""),
 	)
 	header.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 	})
-	scrollArea := unison.NewScrollPanel()
-	scrollArea.SetContent(models.HomeVideoTable, behavior.Fill, behavior.Fill)
-	scrollArea.SetLayoutData(&unison.FlexLayoutData{
+	tableScrollArea = unison.NewScrollPanel()
+	tableScrollArea.SetContent(models.HomeVideoTable, behavior.Fill, behavior.Fill)
+	tableScrollArea.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
 		VAlign: align.Fill,
 		HGrab:  true,
 		VGrab:  true,
 	})
-	scrollArea.SetColumnHeader(header)
-	content.AddChild(scrollArea)
+	tableScrollArea.SetColumnHeader(header)
+	content.AddChild(tableScrollArea)
 }

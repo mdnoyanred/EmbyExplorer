@@ -1,4 +1,4 @@
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz.
 // Emby REST API
 
 package api

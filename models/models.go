@@ -1,27 +1,50 @@
-// (w) 2024 by Jan Buchholz. No rights reserved.
-// Data models for Emby Movies, TV Shows and Home Videos
+// ---------------------------------------------------------------------------------------------------------------------
+// (w) 2024 by Jan Buchholz.
+// Data models for Emby Movies, TV Shows and Home Videos, according to Unison's table model
 // Using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
+// ---------------------------------------------------------------------------------------------------------------------
 
 package models
 
 import (
-	"Emby_Explorer/api"
 	"github.com/richardwilkes/toolbox/errs"
 	"github.com/richardwilkes/toolbox/fatal"
 	"github.com/richardwilkes/toolbox/tid"
 	"github.com/richardwilkes/unison"
 )
 
-var MovieTable *unison.Table[*MovieRow]
-var TVShowTable *unison.Table[*TVShowRow]
-var HomeVideoTable *unison.Table[*HomeVideoRow]
+type TableDescription struct {
+	NoOfFields int
+	Captions   []string
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Movies model
+// ---------------------------------------------------------------------------------------------------------------------
 
 var _ unison.TableRowData[*MovieRow] = &MovieRow{}
-var _ unison.TableRowData[*TVShowRow] = &TVShowRow{}
-var _ unison.TableRowData[*HomeVideoRow] = &HomeVideoRow{}
+var MovieTable *unison.Table[*MovieRow]
+var MovieTableDescription = TableDescription{
+	NoOfFields: 12,
+	Captions: []string{"Title", "Original Title", "Year", "Time", "Actors", "Director", "Studio", "Genre", "Ext.",
+		"Codec", "Resolution", "Path"},
+}
 
-// Movies
+type MovieData struct {
+	Name           string
+	OriginalTitle  string
+	ProductionYear string
+	Runtime        string
+	Actors         string
+	Directors      string
+	Studios        string
+	Genres         string
+	Container      string
+	Codecs         string
+	Resolution     string
+	Path           string
+}
 
 type MovieRow struct {
 	table          *unison.Table[*MovieRow]
@@ -157,7 +180,7 @@ func (d *MovieRow) SetOpen(open bool) {
 	d.open = open
 }
 
-func NewMovieRow(id tid.TID, data api.MovieData) *MovieRow {
+func NewMovieRow(id tid.TID, data MovieData) *MovieRow {
 	row := &MovieRow{
 		table:          MovieTable,
 		id:             id,
@@ -181,7 +204,37 @@ func NewMovieRow(id tid.TID, data api.MovieData) *MovieRow {
 	return row
 }
 
-// TV shows
+// ---------------------------------------------------------------------------------------------------------------------
+// TV shows model
+// ---------------------------------------------------------------------------------------------------------------------
+
+var _ unison.TableRowData[*TVShowRow] = &TVShowRow{}
+var TVShowTable *unison.Table[*TVShowRow]
+var TVShowTableDescription = TableDescription{
+	NoOfFields: 12,
+	Captions: []string{"Series", "Episode", "Season", "Year", "Time", "Actors", "Studio",
+		"Genre", "Ext.", "Codec", "Resolution", "Path"},
+}
+
+type TVShowData struct {
+	Name           string
+	Episode        string
+	Season         string
+	ProductionYear string
+	Runtime        string
+	Actors         string
+	Studios        string
+	Genres         string
+	Container      string
+	Codecs         string
+	Resolution     string
+	Path           string
+	SeriesID       string
+	SeasonID       string
+	EpisodeID      string
+	Type_          string
+	SortIndex      int32
+}
 
 type TVShowRow struct {
 	table          *unison.Table[*TVShowRow]
@@ -241,8 +294,8 @@ func (d *TVShowRow) SetChildren(children []*TVShowRow) {
 	d.children = children
 }
 
-func (d *TVShowRow) CellDataForSort(col int) string {
-	return "" // Disable sorting for TV shows
+func (d *TVShowRow) CellDataForSort(_ int) string {
+	return "" // Disable sorting for TV shows (would break dependencies between series and episodes)
 }
 
 func (d *TVShowRow) ColumnCell(row, col int, foreground, background unison.Ink, selected, indirectlySelected, focused bool) unison.Paneler {
@@ -290,7 +343,7 @@ func (d *TVShowRow) SetOpen(open bool) {
 	d.open = open
 }
 
-func NewTVShowRow(id tid.TID, data api.TVShowData) *TVShowRow {
+func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 	row := &TVShowRow{
 		table:          TVShowTable,
 		id:             id,
@@ -314,7 +367,25 @@ func NewTVShowRow(id tid.TID, data api.TVShowData) *TVShowRow {
 	return row
 }
 
-// Home videos
+// ---------------------------------------------------------------------------------------------------------------------
+// Home videos model
+// ---------------------------------------------------------------------------------------------------------------------
+
+var _ unison.TableRowData[*HomeVideoRow] = &HomeVideoRow{}
+var HomeVideoTable *unison.Table[*HomeVideoRow]
+var HomeVideoTableDescription = TableDescription{
+	NoOfFields: 6,
+	Captions:   []string{"Title", "Time", "Ext.", "Codec", "Resolution", "Path"},
+}
+
+type HomeVideoData struct {
+	Name       string
+	Runtime    string
+	Container  string
+	Codecs     string
+	Resolution string
+	Path       string
+}
 
 type HomeVideoRow struct {
 	table        *unison.Table[*HomeVideoRow]
@@ -420,7 +491,7 @@ func (d *HomeVideoRow) SetOpen(open bool) {
 	d.open = open
 }
 
-func NewHomeVideoRow(id tid.TID, data api.HomeVideoData) *HomeVideoRow {
+func NewHomeVideoRow(id tid.TID, data HomeVideoData) *HomeVideoRow {
 	row := &HomeVideoRow{
 		table:      HomeVideoTable,
 		id:         id,
@@ -438,6 +509,7 @@ func NewHomeVideoRow(id tid.TID, data api.HomeVideoData) *HomeVideoRow {
 	return row
 }
 
+// Taken from the Unison demo
 func addWrappedText(parent *unison.Panel, text string, ink unison.Ink, font unison.Font, width float32) {
 	decoration := &unison.TextDecoration{Font: font}
 	var lines []*unison.Text

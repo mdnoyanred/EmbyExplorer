@@ -1,6 +1,8 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
 // UI MainWindow, using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
+// ---------------------------------------------------------------------------------------------------------------------
 
 package ui
 
@@ -24,7 +26,7 @@ func NewMainWindow() error {
 	if err != nil {
 		return err
 	}
-	mainWindow.SetTitle(assets.AppName)
+	mainWindow.SetTitle(assets.AppName + " " + assets.AppVersion)
 	content := mainWindow.Content()
 	content.SetBorder(unison.NewEmptyBorder(unison.NewUniformInsets(5)))
 	content.SetLayout(&unison.FlexLayout{
@@ -73,6 +75,9 @@ func installDefaultMenus(wnd *unison.Window) {
 }
 
 func installCallbacks() {
+	viewsPopupMenu.SelectionChangedCallback = func(popup *unison.PopupMenu[string]) {
+		setLogoPanel()
+	}
 	mainWindow.AllowCloseCallback = func() bool {
 		return mainWindowAllowClose()
 	}

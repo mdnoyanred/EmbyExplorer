@@ -1,6 +1,8 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
 // Emby preferences dialog, using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
+// ---------------------------------------------------------------------------------------------------------------------
 
 package ui
 

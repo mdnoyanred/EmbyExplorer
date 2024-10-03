@@ -1,14 +1,20 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
 // Event handlers
+// ---------------------------------------------------------------------------------------------------------------------
 
 package ui
 
 import (
 	"Emby_Explorer/api"
 	"Emby_Explorer/assets"
+	"Emby_Explorer/models"
 )
 
 var userViews []api.UserView
+var movieData []models.MovieData
+var tvshowData []models.TVShowData
+var homevideoData []models.HomeVideoData
 
 func embyAuthenticateUser() {
 	userViews = nil
@@ -44,14 +50,14 @@ func embyFetchItemsForUser() {
 	mainContent.RemoveAllChildren()
 	switch view.CollectionType {
 	case api.CollectionMovies:
-		movies := api.GetMovieDisplayData(dto)
-		NewMovieTable(mainContent, movies)
+		movieData = api.GetMovieDisplayData(dto)
+		newMovieTable(mainContent, movieData)
 	case api.CollectionTVShows:
-		tvshows := api.GetTVShowDisplayData(dto)
-		NewTVShowTable(mainContent, tvshows)
+		tvshowData = api.GetTVShowDisplayData(dto)
+		newTVShowTable(mainContent, tvshowData)
 	case api.CollectionHomeVideos:
-		homevideos := api.GetHomeVideoDisplayData(dto)
-		NewHomeVideoTable(mainContent, homevideos)
+		homevideoData = api.GetHomeVideoDisplayData(dto)
+		newHomeVideoTable(mainContent, homevideoData)
 	default:
 	}
 }

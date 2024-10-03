@@ -1,6 +1,8 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
-// Main function, using Unison library (c) Richard A. Wilkes
+// Main function (program startup), using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
+// ---------------------------------------------------------------------------------------------------------------------
 
 package main
 

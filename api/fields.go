@@ -1,9 +1,13 @@
+// ---------------------------------------------------------------------------------------------------------------------
 // (w) 2024 by Jan Buchholz. No rights reserved.
 // Evaluation of Emby DTO & mapping fields to display structures
+// Resolve dependencies for TV shows
+// ---------------------------------------------------------------------------------------------------------------------
 
 package api
 
 import (
+	"Emby_Explorer/models"
 	"sort"
 	"strconv"
 )
@@ -51,53 +55,9 @@ func GetFields(collectiontype string) string {
 	return m
 }
 
-type MovieData struct {
-	Name           string
-	OriginalTitle  string
-	ProductionYear string
-	Runtime        string
-	Actors         string
-	Directors      string
-	Studios        string
-	Genres         string
-	Container      string
-	Codecs         string
-	Resolution     string
-	Path           string
-}
-
-type TVShowData struct {
-	Name           string
-	Episode        string
-	Season         string
-	ProductionYear string
-	Runtime        string
-	Actors         string
-	Studios        string
-	Genres         string
-	Container      string
-	Codecs         string
-	Resolution     string
-	Path           string
-	seriesID       string
-	seasonID       string
-	episodeID      string
-	type_          string
-	sortIndex      int32
-}
-
-type HomeVideoData struct {
-	Name       string
-	Runtime    string
-	Container  string
-	Codecs     string
-	Resolution string
-	Path       string
-}
-
-func GetMovieDisplayData(dto []BaseItemDto) []MovieData {
-	result := make([]MovieData, 0)
-	var movie MovieData
+func GetMovieDisplayData(dto []BaseItemDto) []models.MovieData {
+	result := make([]models.MovieData, 0)
+	var movie models.MovieData
 	for _, d := range dto {
 		movie.Name = d.Name
 		movie.OriginalTitle = d.OriginalTitle
@@ -115,14 +75,14 @@ func GetMovieDisplayData(dto []BaseItemDto) []MovieData {
 	return result
 }
 
-func GetTVShowDisplayData(dto []BaseItemDto) []TVShowData {
-	result := make([]TVShowData, 0)
-	series := make([]TVShowData, 0)
-	seasons := make([]TVShowData, 0)
-	episodes := make([]TVShowData, 0)
-	var item TVShowData
+func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
+	result := make([]models.TVShowData, 0)
+	series := make([]models.TVShowData, 0)
+	seasons := make([]models.TVShowData, 0)
+	episodes := make([]models.TVShowData, 0)
+	var item models.TVShowData
 	for _, d := range dto {
-		item = TVShowData{}
+		item = models.TVShowData{}
 		switch d.Type_ {
 		case seriesType:
 			item.Name = d.Name
@@ -130,31 +90,31 @@ func GetTVShowDisplayData(dto []BaseItemDto) []TVShowData {
 			item.Genres = evalGenres(d.Genres)
 			item.Studios = evalStudios(d.Studios)
 			item.Path = d.Path
-			item.seriesID = d.Id
-			item.type_ = d.Type_
+			item.SeriesID = d.Id
+			item.Type_ = d.Type_
 			series = append(series, item)
 		case seasonType:
 			item.Season = d.Name
-			item.seriesID = d.SeriesId
-			item.seasonID = d.Id
-			item.sortIndex = d.IndexNumber
+			item.SeriesID = d.SeriesId
+			item.SeasonID = d.Id
+			item.SortIndex = d.IndexNumber
 			item.Path = d.Path
-			item.type_ = d.Type_
+			item.Type_ = d.Type_
 			seasons = append(seasons, item)
 		case episodeType:
 			item.Episode = d.Name
-			item.episodeID = d.Id
+			item.EpisodeID = d.Id
 			item.Runtime = evalRuntime(d.RunTimeTicks)
 			item.Container = d.Container
 			item.Codecs = evalCodecs(d.MediaSources)
 			item.Resolution = evalResolution(d.Width, d.Height)
 			item.ProductionYear = strconv.Itoa(int(d.ProductionYear))
 			item.Actors, _ = evalPeople(d.People)
-			item.sortIndex = d.IndexNumber
+			item.SortIndex = d.IndexNumber
 			item.Path = d.Path
-			item.seriesID = d.SeriesId
-			item.seasonID = d.SeasonId
-			item.type_ = d.Type_
+			item.SeriesID = d.SeriesId
+			item.SeasonID = d.SeasonId
+			item.Type_ = d.Type_
 			episodes = append(episodes, item)
 		default:
 		}
@@ -165,37 +125,36 @@ func GetTVShowDisplayData(dto []BaseItemDto) []TVShowData {
 	})
 	// Sort seasons by series
 	sort.Slice(seasons, func(i, j int) bool {
-		return seasons[i].seriesID < seasons[j].seriesID
+		return seasons[i].SeriesID < seasons[j].SeriesID
 	})
 	// Sort episodes by series
 	sort.Slice(episodes, func(i, j int) bool {
-		return episodes[i].seriesID < episodes[j].seriesID
+		return episodes[i].SeriesID < episodes[j].SeriesID
 	})
 	for _, s := range series {
 		result = append(result, s)
-		seasonstmp := make([]TVShowData, 0)
+		seasonstmp := make([]models.TVShowData, 0)
 		// Find seasons for series
 		for _, season := range seasons {
-			if season.seriesID == s.seriesID {
+			if season.SeriesID == s.SeriesID {
 				seasonstmp = append(seasonstmp, season)
 			}
 		}
 		// Sort seasons by IndexNumber
 		sort.Slice(seasonstmp, func(i, j int) bool {
-			return seasonstmp[i].sortIndex < seasonstmp[j].sortIndex
+			return seasonstmp[i].SortIndex < seasonstmp[j].SortIndex
 		})
 		for _, n := range seasonstmp {
-			n.Name = s.Name
 			// Find episodes for series and season
-			episodesstmp := make([]TVShowData, 0)
+			episodesstmp := make([]models.TVShowData, 0)
 			for _, episode := range episodes {
-				if episode.seriesID == n.seriesID && episode.seasonID == n.seasonID {
+				if episode.SeriesID == n.SeriesID && episode.SeasonID == n.SeasonID {
 					episodesstmp = append(episodesstmp, episode)
 				}
 			}
 			// Sort episodes by IndexNumber
 			sort.Slice(episodesstmp, func(i, j int) bool {
-				return episodesstmp[i].sortIndex < episodesstmp[j].sortIndex
+				return episodesstmp[i].SortIndex < episodesstmp[j].SortIndex
 			})
 			for _, e := range episodesstmp {
 				e.Name = s.Name
@@ -212,9 +171,9 @@ func GetTVShowDisplayData(dto []BaseItemDto) []TVShowData {
 	return result
 }
 
-func GetHomeVideoDisplayData(dto []BaseItemDto) []HomeVideoData {
-	result := make([]HomeVideoData, 0)
-	var video HomeVideoData
+func GetHomeVideoDisplayData(dto []BaseItemDto) []models.HomeVideoData {
+	result := make([]models.HomeVideoData, 0)
+	var video models.HomeVideoData
 	for _, d := range dto {
 		video.Name = d.Name
 		video.Container = d.Container
