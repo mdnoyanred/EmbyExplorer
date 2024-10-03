@@ -177,7 +177,7 @@ func setLogoPanel() {
 
 func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 	models.MovieTable = unison.NewTable[*models.MovieRow](&unison.SimpleTableModel[*models.MovieRow]{})
-	models.MovieTable.Columns = make([]unison.ColumnInfo, models.MovieTableDescription.NoOfFields)
+	models.MovieTable.Columns = make([]unison.ColumnInfo, models.MovieTableDescription.NoOfColumns)
 	for i := range models.MovieTable.Columns {
 		models.MovieTable.Columns[i].ID = i
 		models.MovieTable.Columns[i].Minimum = 20
@@ -218,12 +218,16 @@ func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 		VGrab:  true,
 	})
 	tableScrollArea.SetColumnHeader(header)
+	models.MovieTable.SelectionChangedCallback = func() {
+		//selection := models.MovieTable.SelectedRows(true)
+		// to do!
+	}
 	content.AddChild(tableScrollArea)
 }
 
 func newTVShowTable(content *unison.Panel, tvshowData []models.TVShowData) {
 	models.TVShowTable = unison.NewTable[*models.TVShowRow](&unison.SimpleTableModel[*models.TVShowRow]{})
-	models.TVShowTable.Columns = make([]unison.ColumnInfo, models.TVShowTableDescription.NoOfFields)
+	models.TVShowTable.Columns = make([]unison.ColumnInfo, models.TVShowTableDescription.NoOfColumns)
 	for i := range models.TVShowTable.Columns {
 		models.TVShowTable.Columns[i].ID = i
 		models.TVShowTable.Columns[i].Minimum = 20
@@ -269,7 +273,7 @@ func newTVShowTable(content *unison.Panel, tvshowData []models.TVShowData) {
 
 func newHomeVideoTable(content *unison.Panel, homevideoData []models.HomeVideoData) {
 	models.HomeVideoTable = unison.NewTable[*models.HomeVideoRow](&unison.SimpleTableModel[*models.HomeVideoRow]{})
-	models.HomeVideoTable.Columns = make([]unison.ColumnInfo, models.HomeVideoTableDescription.NoOfFields)
+	models.HomeVideoTable.Columns = make([]unison.ColumnInfo, models.HomeVideoTableDescription.NoOfColumns)
 	for i := range models.HomeVideoTable.Columns {
 		models.HomeVideoTable.Columns[i].ID = i
 		models.HomeVideoTable.Columns[i].Minimum = 20

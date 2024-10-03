@@ -49,6 +49,7 @@ func GetMovieDisplayData(dto []BaseItemDto) []models.MovieData {
 		movie.Codecs = evalCodecs(d.MediaSources)
 		movie.Runtime = evalRuntime(d.RunTimeTicks)
 		movie.Path = d.Path
+		movie.Overview = d.Overview
 		result = append(result, movie)
 	}
 	return result
@@ -91,6 +92,7 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			item.Actors, _ = evalPeople(d.People)
 			item.SortIndex = d.IndexNumber
 			item.Path = d.Path
+			item.Overview = d.Overview
 			item.SeriesID = d.SeriesId
 			item.SeasonID = d.SeasonId
 			item.Type_ = d.Type_

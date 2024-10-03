@@ -15,9 +15,9 @@ import (
 )
 
 type TableDescription struct {
-	NoOfFields int
-	Captions   []string
-	APIFields  string
+	NoOfColumns int
+	Captions    []string
+	APIFields   string
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -27,11 +27,11 @@ type TableDescription struct {
 var _ unison.TableRowData[*MovieRow] = &MovieRow{}
 var MovieTable *unison.Table[*MovieRow]
 var MovieTableDescription = TableDescription{
-	NoOfFields: 12,
+	NoOfColumns: 12, //displayed columns only
 	Captions: []string{"Title", "Original Title", "Year", "Time", "Actors", "Director", "Studio", "Genre", "Ext.",
 		"Codec", "Resolution", "Path"},
 	APIFields: "Name,OriginalTitle,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container," +
-		"RunTimeTicks,Type_", //no spaces!
+		"Overview,RunTimeTicks,Type_", //no spaces here!
 }
 
 type MovieData struct {
@@ -47,28 +47,18 @@ type MovieData struct {
 	Codecs         string
 	Resolution     string
 	Path           string
+	Overview       string
 }
 
 type MovieRow struct {
-	table          *unison.Table[*MovieRow]
-	parent         *MovieRow
-	children       []*MovieRow
-	container      bool
-	open           bool
-	doubleHeight   bool
-	id             tid.TID
-	Name           string
-	OriginalTitle  string
-	ProductionYear string
-	Runtime        string
-	Actors         string
-	Directors      string
-	Studios        string
-	Genres         string
-	Container      string
-	Codecs         string
-	Resolution     string
-	Path           string
+	table        *unison.Table[*MovieRow]
+	parent       *MovieRow
+	children     []*MovieRow
+	container    bool
+	open         bool
+	doubleHeight bool
+	id           tid.TID
+	m            MovieData
 }
 
 func (d *MovieRow) CloneForTarget(target unison.Paneler, newParent *MovieRow) *MovieRow {
@@ -110,29 +100,29 @@ func (d *MovieRow) SetChildren(children []*MovieRow) {
 func (d *MovieRow) CellDataForSort(col int) string {
 	switch col {
 	case 0:
-		return d.Name
+		return d.m.Name
 	case 1:
-		return d.OriginalTitle
+		return d.m.OriginalTitle
 	case 2:
-		return d.ProductionYear
+		return d.m.ProductionYear
 	case 3:
-		return d.Runtime
+		return d.m.Runtime
 	case 4:
-		return d.Actors
+		return d.m.Actors
 	case 5:
-		return d.Directors
+		return d.m.Directors
 	case 6:
-		return d.Studios
+		return d.m.Studios
 	case 7:
-		return d.Genres
+		return d.m.Genres
 	case 8:
-		return d.Container
+		return d.m.Container
 	case 9:
-		return d.Codecs
+		return d.m.Codecs
 	case 10:
-		return d.Resolution
+		return d.m.Resolution
 	case 11:
-		return d.Path
+		return d.m.Path
 	default:
 		return ""
 	}
@@ -142,29 +132,29 @@ func (d *MovieRow) ColumnCell(row, col int, foreground, background unison.Ink, s
 	var text string
 	switch col {
 	case 0:
-		text = d.Name
+		text = d.m.Name
 	case 1:
-		text = d.OriginalTitle
+		text = d.m.OriginalTitle
 	case 2:
-		text = d.ProductionYear
+		text = d.m.ProductionYear
 	case 3:
-		text = d.Runtime
+		text = d.m.Runtime
 	case 4:
-		text = d.Actors
+		text = d.m.Actors
 	case 5:
-		text = d.Directors
+		text = d.m.Directors
 	case 6:
-		text = d.Studios
+		text = d.m.Studios
 	case 7:
-		text = d.Genres
+		text = d.m.Genres
 	case 8:
-		text = d.Container
+		text = d.m.Container
 	case 9:
-		text = d.Codecs
+		text = d.m.Codecs
 	case 10:
-		text = d.Resolution
+		text = d.m.Resolution
 	case 11:
-		text = d.Path
+		text = d.m.Path
 	default:
 		text = ""
 	}
@@ -185,24 +175,16 @@ func (d *MovieRow) SetOpen(open bool) {
 
 func NewMovieRow(id tid.TID, data MovieData) *MovieRow {
 	row := &MovieRow{
-		table:          MovieTable,
-		id:             id,
-		container:      false,
-		open:           false,
-		parent:         nil,
-		children:       nil,
-		Name:           data.Name,
-		OriginalTitle:  data.OriginalTitle,
-		ProductionYear: data.ProductionYear,
-		Runtime:        data.Runtime,
-		Actors:         data.Actors,
-		Directors:      data.Directors,
-		Studios:        data.Studios,
-		Genres:         data.Genres,
-		Container:      data.Container,
-		Codecs:         data.Codecs,
-		Resolution:     data.Resolution,
-		Path:           data.Path,
+		table:     MovieTable,
+		id:        id,
+		container: false,
+		open:      false,
+		parent:    nil,
+		children:  nil,
+		m: MovieData{data.Name, data.OriginalTitle, data.ProductionYear,
+			data.Runtime, data.Actors, data.Directors, data.Studios,
+			data.Genres, data.Container, data.Codecs, data.Resolution,
+			data.Path, data.Overview},
 	}
 	return row
 }
@@ -214,11 +196,11 @@ func NewMovieRow(id tid.TID, data MovieData) *MovieRow {
 var _ unison.TableRowData[*TVShowRow] = &TVShowRow{}
 var TVShowTable *unison.Table[*TVShowRow]
 var TVShowTableDescription = TableDescription{
-	NoOfFields: 12,
+	NoOfColumns: 12, //displayed columns only
 	Captions: []string{"Series", "Episode", "Season", "Year", "Time", "Actors", "Studio", "Genre", "Ext.", "Codec",
 		"Resolution", "Path"},
 	APIFields: "Name,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container,RunTimeTicks," +
-		"SeriesId,SeasonId,Id,ParentId,IndexNumber,Type_", //no spaces!
+		"Overview,SeriesId,SeasonId,Id,ParentId,IndexNumber,Type_", //no spaces here!
 }
 
 type TVShowData struct {
@@ -234,6 +216,7 @@ type TVShowData struct {
 	Codecs         string
 	Resolution     string
 	Path           string
+	Overview       string
 	SeriesID       string
 	SeasonID       string
 	EpisodeID      string
@@ -242,25 +225,14 @@ type TVShowData struct {
 }
 
 type TVShowRow struct {
-	table          *unison.Table[*TVShowRow]
-	parent         *TVShowRow
-	children       []*TVShowRow
-	container      bool
-	open           bool
-	doubleHeight   bool
-	id             tid.TID
-	Name           string
-	Episode        string
-	Season         string
-	ProductionYear string
-	Runtime        string
-	Actors         string
-	Studios        string
-	Genres         string
-	Container      string
-	Codecs         string
-	Resolution     string
-	Path           string
+	table        *unison.Table[*TVShowRow]
+	parent       *TVShowRow
+	children     []*TVShowRow
+	container    bool
+	open         bool
+	doubleHeight bool
+	id           tid.TID
+	m            TVShowData
 }
 
 func (d *TVShowRow) CloneForTarget(target unison.Paneler, newParent *TVShowRow) *TVShowRow {
@@ -307,29 +279,29 @@ func (d *TVShowRow) ColumnCell(row, col int, foreground, background unison.Ink, 
 	var text string
 	switch col {
 	case 0:
-		text = d.Name
+		text = d.m.Name
 	case 1:
-		text = d.Episode
+		text = d.m.Episode
 	case 2:
-		text = d.Season
+		text = d.m.Season
 	case 3:
-		text = d.ProductionYear
+		text = d.m.ProductionYear
 	case 4:
-		text = d.Runtime
+		text = d.m.Runtime
 	case 5:
-		text = d.Actors
+		text = d.m.Actors
 	case 6:
-		text = d.Studios
+		text = d.m.Studios
 	case 7:
-		text = d.Genres
+		text = d.m.Genres
 	case 8:
-		text = d.Container
+		text = d.m.Container
 	case 9:
-		text = d.Codecs
+		text = d.m.Codecs
 	case 10:
-		text = d.Resolution
+		text = d.m.Resolution
 	case 11:
-		text = d.Path
+		text = d.m.Path
 	default:
 		text = ""
 	}
@@ -350,24 +322,17 @@ func (d *TVShowRow) SetOpen(open bool) {
 
 func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 	row := &TVShowRow{
-		table:          TVShowTable,
-		id:             id,
-		container:      false,
-		open:           false,
-		parent:         nil,
-		children:       nil,
-		Name:           data.Name,
-		Episode:        data.Episode,
-		Season:         data.Season,
-		ProductionYear: data.ProductionYear,
-		Runtime:        data.Runtime,
-		Actors:         data.Actors,
-		Studios:        data.Studios,
-		Genres:         data.Genres,
-		Container:      data.Container,
-		Codecs:         data.Codecs,
-		Resolution:     data.Resolution,
-		Path:           data.Path,
+		table:     TVShowTable,
+		id:        id,
+		container: false,
+		open:      false,
+		parent:    nil,
+		children:  nil,
+		m: TVShowData{data.Name, data.Episode, data.Season, data.ProductionYear,
+			data.Runtime, data.Actors, data.Studios, data.Genres, data.Container,
+			data.Codecs, data.Resolution, data.Path, data.Overview,
+			data.SeriesID, data.SeasonID, data.EpisodeID, data.Type_,
+			data.SortIndex},
 	}
 	return row
 }
@@ -379,9 +344,9 @@ func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 var _ unison.TableRowData[*HomeVideoRow] = &HomeVideoRow{}
 var HomeVideoTable *unison.Table[*HomeVideoRow]
 var HomeVideoTableDescription = TableDescription{
-	NoOfFields: 6,
-	Captions:   []string{"Title", "Time", "Ext.", "Codec", "Resolution", "Path"},
-	APIFields:  "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,Type_", //no spaces!
+	NoOfColumns: 6, //displayed columns only
+	Captions:    []string{"Title", "Time", "Ext.", "Codec", "Resolution", "Path"},
+	APIFields:   "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,Type_", //no spaces here!
 }
 
 type HomeVideoData struct {
@@ -401,12 +366,7 @@ type HomeVideoRow struct {
 	open         bool
 	doubleHeight bool
 	id           tid.TID
-	Name         string
-	Runtime      string
-	Container    string
-	Codecs       string
-	Resolution   string
-	Path         string
+	m            HomeVideoData
 }
 
 func (d *HomeVideoRow) CloneForTarget(target unison.Paneler, newParent *HomeVideoRow) *HomeVideoRow {
@@ -448,17 +408,17 @@ func (d *HomeVideoRow) SetChildren(children []*HomeVideoRow) {
 func (d *HomeVideoRow) CellDataForSort(col int) string {
 	switch col {
 	case 0:
-		return d.Name
+		return d.m.Name
 	case 1:
-		return d.Runtime
+		return d.m.Runtime
 	case 2:
-		return d.Container
+		return d.m.Container
 	case 3:
-		return d.Codecs
+		return d.m.Codecs
 	case 4:
-		return d.Resolution
+		return d.m.Resolution
 	case 5:
-		return d.Path
+		return d.m.Path
 	default:
 		return ""
 	}
@@ -468,17 +428,17 @@ func (d *HomeVideoRow) ColumnCell(row, col int, foreground, background unison.In
 	var text string
 	switch col {
 	case 0:
-		text = d.Name
+		text = d.m.Name
 	case 1:
-		text = d.Runtime
+		text = d.m.Runtime
 	case 2:
-		text = d.Container
+		text = d.m.Container
 	case 3:
-		text = d.Codecs
+		text = d.m.Codecs
 	case 4:
-		text = d.Resolution
+		text = d.m.Resolution
 	case 5:
-		text = d.Path
+		text = d.m.Path
 	default:
 		text = ""
 	}
@@ -499,18 +459,14 @@ func (d *HomeVideoRow) SetOpen(open bool) {
 
 func NewHomeVideoRow(id tid.TID, data HomeVideoData) *HomeVideoRow {
 	row := &HomeVideoRow{
-		table:      HomeVideoTable,
-		id:         id,
-		container:  false,
-		open:       false,
-		parent:     nil,
-		children:   nil,
-		Name:       data.Name,
-		Runtime:    data.Runtime,
-		Container:  data.Container,
-		Codecs:     data.Codecs,
-		Resolution: data.Resolution,
-		Path:       data.Path,
+		table:     HomeVideoTable,
+		id:        id,
+		container: false,
+		open:      false,
+		parent:    nil,
+		children:  nil,
+		m: HomeVideoData{data.Name, data.Runtime, data.Container, data.Codecs,
+			data.Resolution, data.Path},
 	}
 	return row
 }
