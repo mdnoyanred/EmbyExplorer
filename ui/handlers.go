@@ -52,6 +52,9 @@ func embyFetchItemsForUser() {
 	case api.CollectionMovies:
 		movieData = api.GetMovieDisplayData(dto)
 		newMovieTable(mainContent, movieData)
+		if len(movieData) > 0 {
+			models.MovieTable.SelectByIndex(0)
+		}
 	case api.CollectionTVShows:
 		tvshowData = api.GetTVShowDisplayData(dto)
 		newTVShowTable(mainContent, tvshowData)

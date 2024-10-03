@@ -154,15 +154,44 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 
 func GetHomeVideoDisplayData(dto []BaseItemDto) []models.HomeVideoData {
 	result := make([]models.HomeVideoData, 0)
-	var video models.HomeVideoData
+	folders := make([]models.HomeVideoData, 0)
+	videos := make([]models.HomeVideoData, 0)
+	var video, folder models.HomeVideoData
 	for _, d := range dto {
-		video.Name = d.Name
-		video.Container = d.Container
-		video.Resolution = evalResolution(d.Width, d.Height)
-		video.Codecs = evalCodecs(d.MediaSources)
-		video.Runtime = evalRuntime(d.RunTimeTicks)
-		video.Path = d.Path
-		result = append(result, video)
+		switch d.Type_ {
+		case videoType:
+			video = models.HomeVideoData{}
+			video.Name = d.Name
+			video.Container = d.Container
+			video.Resolution = evalResolution(d.Width, d.Height)
+			video.Codecs = evalCodecs(d.MediaSources)
+			video.Runtime = evalRuntime(d.RunTimeTicks)
+			video.Path = d.Path
+			video.ParentId = d.ParentId
+			videos = append(videos, video)
+		case folderType:
+			folder = models.HomeVideoData{}
+			folder.Name = d.Name
+			folder.FolderId = d.Id
+			folders = append(folders, folder)
+		default:
+		}
+	}
+	// Sort folders by Name
+	sort.Slice(folders, func(i, j int) bool {
+		return folders[i].Name < folders[j].Name
+	})
+	// Sort videos by Name
+	sort.Slice(videos, func(i, j int) bool {
+		return videos[i].Name < videos[j].Name
+	})
+	for _, f := range folders {
+		for _, v := range videos {
+			if v.ParentId == f.FolderId {
+				v.Folder = f.Name
+				result = append(result, v)
+			}
+		}
 	}
 	return result
 }

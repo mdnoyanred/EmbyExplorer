@@ -344,18 +344,21 @@ func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 var _ unison.TableRowData[*HomeVideoRow] = &HomeVideoRow{}
 var HomeVideoTable *unison.Table[*HomeVideoRow]
 var HomeVideoTableDescription = TableDescription{
-	NoOfColumns: 6, //displayed columns only
-	Captions:    []string{"Title", "Time", "Ext.", "Codec", "Resolution", "Path"},
-	APIFields:   "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,Type_", //no spaces here!
+	NoOfColumns: 7, //displayed columns only
+	Captions:    []string{"Title", "Folder", "Time", "Ext.", "Codec", "Resolution", "Path"},
+	APIFields:   "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,ParentId,Type_", //no spaces here!
 }
 
 type HomeVideoData struct {
 	Name       string
+	Folder     string
 	Runtime    string
 	Container  string
 	Codecs     string
 	Resolution string
 	Path       string
+	FolderId   string
+	ParentId   string
 }
 
 type HomeVideoRow struct {
@@ -410,14 +413,16 @@ func (d *HomeVideoRow) CellDataForSort(col int) string {
 	case 0:
 		return d.m.Name
 	case 1:
-		return d.m.Runtime
+		return d.m.Folder
 	case 2:
-		return d.m.Container
+		return d.m.Runtime
 	case 3:
-		return d.m.Codecs
+		return d.m.Container
 	case 4:
-		return d.m.Resolution
+		return d.m.Codecs
 	case 5:
+		return d.m.Resolution
+	case 6:
 		return d.m.Path
 	default:
 		return ""
@@ -430,14 +435,16 @@ func (d *HomeVideoRow) ColumnCell(row, col int, foreground, background unison.In
 	case 0:
 		text = d.m.Name
 	case 1:
-		text = d.m.Runtime
+		text = d.m.Folder
 	case 2:
-		text = d.m.Container
+		text = d.m.Runtime
 	case 3:
-		text = d.m.Codecs
+		text = d.m.Container
 	case 4:
-		text = d.m.Resolution
+		text = d.m.Codecs
 	case 5:
+		text = d.m.Resolution
+	case 6:
 		text = d.m.Path
 	default:
 		text = ""
@@ -465,8 +472,8 @@ func NewHomeVideoRow(id tid.TID, data HomeVideoData) *HomeVideoRow {
 		open:      false,
 		parent:    nil,
 		children:  nil,
-		m: HomeVideoData{data.Name, data.Runtime, data.Container, data.Codecs,
-			data.Resolution, data.Path},
+		m: HomeVideoData{data.Name, data.Folder, data.Runtime, data.Container, data.Codecs,
+			data.Resolution, data.Path, data.FolderId, data.ParentId},
 	}
 	return row
 }

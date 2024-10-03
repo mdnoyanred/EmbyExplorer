@@ -71,6 +71,7 @@ const (
 	seasonType  = "Season"
 	episodeType = "Episode"
 	movieType   = "Movie"
+	folderType  = "Folder"
 )
 
 // Body for auth. REST call
@@ -258,7 +259,7 @@ func UserGetItenms(id string, collectionid string, collectiontype string, access
 				result = append(result, item)
 			}
 		case CollectionHomeVideos:
-			if item.Type_ == videoType {
+			if item.Type_ == videoType || item.Type_ == folderType {
 				result = append(result, item)
 			}
 		default:

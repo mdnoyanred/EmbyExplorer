@@ -10,6 +10,7 @@ package ui
 import (
 	"Emby_Explorer/assets"
 	"Emby_Explorer/models"
+	"fmt"
 	"github.com/richardwilkes/toolbox/tid"
 	"github.com/richardwilkes/unison"
 	"github.com/richardwilkes/unison/enums/align"
@@ -219,8 +220,10 @@ func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 	})
 	tableScrollArea.SetColumnHeader(header)
 	models.MovieTable.SelectionChangedCallback = func() {
-		//selection := models.MovieTable.SelectedRows(true)
-		// to do!
+		selection := models.MovieTable.SelectedRows(true)
+		if selection != nil {
+			fmt.Println("Selected")
+		}
 	}
 	content.AddChild(tableScrollArea)
 }
@@ -293,6 +296,7 @@ func newHomeVideoTable(content *unison.Panel, homevideoData []models.HomeVideoDa
 		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[3], ""),
 		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[4], ""),
 		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[5], ""),
+		unison.NewTableColumnHeader[*models.HomeVideoRow](models.HomeVideoTableDescription.Captions[6], ""),
 	)
 	header.SetLayoutData(&unison.FlexLayoutData{
 		HAlign: align.Fill,
