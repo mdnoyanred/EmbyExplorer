@@ -21,6 +21,7 @@ const (
 	CapUser         = "Emby User"
 	CapPassword     = "Emby Password"
 	CapSecure       = "Use https protocol"
+	CapDetails      = "Details"
 )
 
 const (

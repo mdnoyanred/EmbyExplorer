@@ -66,12 +66,12 @@ var allowedCollectionTypes = []string{CollectionMovies, CollectionTVShows, Colle
 
 // Emby item types
 const (
-	videoType   = "Video"
-	seriesType  = "Series"
-	seasonType  = "Season"
-	episodeType = "Episode"
-	movieType   = "Movie"
-	folderType  = "Folder"
+	VideoType   = "Video"
+	SeriesType  = "Series"
+	SeasonType  = "Season"
+	EpisodeType = "Episode"
+	MovieType   = "Movie"
+	FolderType  = "Folder"
 )
 
 // Body for auth. REST call
@@ -251,15 +251,15 @@ func UserGetItenms(id string, collectionid string, collectiontype string, access
 	for _, item := range tmp.Items {
 		switch collectiontype {
 		case CollectionMovies:
-			if item.Type_ == movieType {
+			if item.Type_ == MovieType {
 				result = append(result, item)
 			}
 		case CollectionTVShows:
-			if item.Type_ == seriesType || item.Type_ == seasonType || item.Type_ == episodeType {
+			if item.Type_ == SeriesType || item.Type_ == SeasonType || item.Type_ == EpisodeType {
 				result = append(result, item)
 			}
 		case CollectionHomeVideos:
-			if item.Type_ == videoType || item.Type_ == folderType {
+			if item.Type_ == VideoType || item.Type_ == FolderType {
 				result = append(result, item)
 			}
 		default:

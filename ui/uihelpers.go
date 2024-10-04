@@ -10,7 +10,6 @@ package ui
 import (
 	"Emby_Explorer/assets"
 	"Emby_Explorer/models"
-	"fmt"
 	"github.com/richardwilkes/toolbox/tid"
 	"github.com/richardwilkes/unison"
 	"github.com/richardwilkes/unison/enums/align"
@@ -30,6 +29,7 @@ var viewsPopupMenu *unison.PopupMenu[string]
 var prefsBtn *unison.Button
 var authBtn *unison.Button
 var fetchBtn *unison.Button
+var detailsBtn *unison.Button
 
 var mainContent *unison.Panel
 var logoPanel *unison.Panel
@@ -69,10 +69,11 @@ func createSpacer(width float32, panel *unison.Panel) {
 	panel.AddChild(spacer)
 }
 
-func setFunctions(prefs bool, auth bool, fetch bool) {
+func setFunctions(prefs bool, auth bool, fetch bool, details bool) {
 	prefsBtn.SetEnabled(prefs)
 	authBtn.SetEnabled(auth)
 	fetchBtn.SetEnabled(fetch)
+	detailsBtn.SetEnabled(details)
 }
 
 func createToolbarPanel() *unison.Panel {
@@ -122,6 +123,13 @@ func createToolbarPanel() *unison.Panel {
 		fetchBtn.SetFocusable(false)
 		panel.AddChild(fetchBtn)
 		fetchBtn.ClickCallback = func() { embyFetchItemsForUser() }
+	}
+	detailsBtn, err = createButton(assets.CapDetails, assets.IconDetails)
+	if err == nil {
+		detailsBtn.SetEnabled(true)
+		detailsBtn.SetFocusable(false)
+		panel.AddChild(detailsBtn)
+		detailsBtn.ClickCallback = func() { embyFetchDetails() }
 	}
 	return panel
 }
@@ -219,12 +227,6 @@ func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 		VGrab:  true,
 	})
 	tableScrollArea.SetColumnHeader(header)
-	models.MovieTable.SelectionChangedCallback = func() {
-		selection := models.MovieTable.SelectedRows(true)
-		if selection != nil {
-			fmt.Println("Selected")
-		}
-	}
 	content.AddChild(tableScrollArea)
 }
 

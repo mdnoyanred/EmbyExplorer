@@ -63,7 +63,7 @@ func NewMainWindow() error {
 	if v {
 		api.InitApiPreferences(prefs.EmbySecure, prefs.EmbyServer, prefs.EmbyPort, prefs.EmbyUser, prefs.EmbyPassword)
 	}
-	setFunctions(true, v, false)
+	setFunctions(true, v, false, false)
 	mainWindow.ToFront()
 	return nil
 }

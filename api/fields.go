@@ -64,7 +64,7 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 	for _, d := range dto {
 		item = models.TVShowData{}
 		switch d.Type_ {
-		case seriesType:
+		case SeriesType:
 			item.Name = d.Name
 			item.Actors, _ = evalPeople(d.People)
 			item.Genres = evalGenres(d.Genres)
@@ -73,7 +73,7 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			item.SeriesID = d.Id
 			item.Type_ = d.Type_
 			series = append(series, item)
-		case seasonType:
+		case SeasonType:
 			item.Season = d.Name
 			item.SeriesID = d.SeriesId
 			item.SeasonID = d.Id
@@ -81,7 +81,7 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			item.Path = d.Path
 			item.Type_ = d.Type_
 			seasons = append(seasons, item)
-		case episodeType:
+		case EpisodeType:
 			item.Episode = d.Name
 			item.EpisodeID = d.Id
 			item.Runtime = evalRuntime(d.RunTimeTicks)
@@ -159,7 +159,7 @@ func GetHomeVideoDisplayData(dto []BaseItemDto) []models.HomeVideoData {
 	var video, folder models.HomeVideoData
 	for _, d := range dto {
 		switch d.Type_ {
-		case videoType:
+		case VideoType:
 			video = models.HomeVideoData{}
 			video.Name = d.Name
 			video.Container = d.Container
@@ -169,7 +169,7 @@ func GetHomeVideoDisplayData(dto []BaseItemDto) []models.HomeVideoData {
 			video.Path = d.Path
 			video.ParentId = d.ParentId
 			videos = append(videos, video)
-		case folderType:
+		case FolderType:
 			folder = models.HomeVideoData{}
 			folder.Name = d.Name
 			folder.FolderId = d.Id
