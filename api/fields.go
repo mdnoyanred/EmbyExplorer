@@ -210,10 +210,8 @@ func evalStudios(studios []NameLongIdPair) string {
 }
 
 func evalPeople(people []BaseItemPerson) (string, string) {
-	var actors = ""
-	var directors = ""
-	var countactors = 0
-	var countdirectors = 0
+	var actors, directors = "", ""
+	var countactors, countdirectors = 0, 0
 	for _, p := range people {
 		if *p.Type_ == ACTOR_PersonType {
 			countactors++
@@ -259,9 +257,7 @@ func evalRuntime(ticks int64) string {
 }
 
 func evalCodecs(media []MediaSourceInfo) string {
-	var codecs = ""
-	var codecVideo = ""
-	var codecAudio = ""
+	var codecs, codecVideo, codecAudio = "", "", ""
 	for _, m := range media {
 		for _, s := range m.MediaStreams {
 			if *s.Type_ == VIDEO_MediaStreamType {

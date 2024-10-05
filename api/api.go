@@ -44,6 +44,7 @@ const (
 	authKeyDevice   = "Device"
 	authKeyDeviceId = "DeviceId"
 	authKeyVersion  = "Version"
+	client          = "EmbyExplorer"
 )
 
 const (
@@ -339,7 +340,7 @@ func createPair(key string, value string) string {
 func createHeader(userid string) string {
 	var h string
 	host, _ := os.Hostname()
-	h = authType + " " + createPair(authKeyUserId, userid) + ", " + createPair(authKeyClient, "PC") + ", " +
+	h = authType + " " + createPair(authKeyUserId, userid) + ", " + createPair(authKeyClient, client) + ", " +
 		createPair(authKeyDevice, runtime.GOOS) + ", " + createPair(authKeyDeviceId, host) + ", " +
 		createPair(authKeyVersion, "1.0.0.0")
 	return h

@@ -129,7 +129,7 @@ func (d *MovieRow) CellDataForSort(col int) string {
 	}
 }
 
-func (d *MovieRow) ColumnCell(row, col int, foreground, background unison.Ink, selected, indirectlySelected, focused bool) unison.Paneler {
+func (d *MovieRow) ColumnCell(_, col int, foreground, _ unison.Ink, _, _, _ bool) unison.Paneler {
 	var text string
 	switch col {
 	case 0:
@@ -161,8 +161,7 @@ func (d *MovieRow) ColumnCell(row, col int, foreground, background unison.Ink, s
 	}
 	wrapper := unison.NewPanel()
 	wrapper.SetLayout(&unison.FlexLayout{Columns: 1})
-	width := d.table.CellWidth(row, col)
-	addWrappedText(wrapper, text, foreground, unison.LabelFont, width)
+	addText(wrapper, text, foreground, unison.LabelFont)
 	return wrapper
 }
 
@@ -276,7 +275,7 @@ func (d *TVShowRow) CellDataForSort(_ int) string {
 	return "" // Disable sorting for TV shows (would break dependencies between series and episodes)
 }
 
-func (d *TVShowRow) ColumnCell(row, col int, foreground, background unison.Ink, selected, indirectlySelected, focused bool) unison.Paneler {
+func (d *TVShowRow) ColumnCell(_, col int, foreground, _ unison.Ink, _, _, _ bool) unison.Paneler {
 	var text string
 	switch col {
 	case 0:
@@ -308,8 +307,7 @@ func (d *TVShowRow) ColumnCell(row, col int, foreground, background unison.Ink, 
 	}
 	wrapper := unison.NewPanel()
 	wrapper.SetLayout(&unison.FlexLayout{Columns: 1})
-	width := d.table.CellWidth(row, col)
-	addWrappedText(wrapper, text, foreground, unison.LabelFont, width)
+	addText(wrapper, text, foreground, unison.LabelFont)
 	return wrapper
 }
 
@@ -430,7 +428,7 @@ func (d *HomeVideoRow) CellDataForSort(col int) string {
 	}
 }
 
-func (d *HomeVideoRow) ColumnCell(row, col int, foreground, background unison.Ink, selected, indirectlySelected, focused bool) unison.Paneler {
+func (d *HomeVideoRow) ColumnCell(_, col int, foreground, _ unison.Ink, _, _, _ bool) unison.Paneler {
 	var text string
 	switch col {
 	case 0:
@@ -452,8 +450,7 @@ func (d *HomeVideoRow) ColumnCell(row, col int, foreground, background unison.In
 	}
 	wrapper := unison.NewPanel()
 	wrapper.SetLayout(&unison.FlexLayout{Columns: 1})
-	width := d.table.CellWidth(row, col)
-	addWrappedText(wrapper, text, foreground, unison.LabelFont, width)
+	addText(wrapper, text, foreground, unison.LabelFont)
 	return wrapper
 }
 
@@ -479,20 +476,11 @@ func NewHomeVideoRow(id tid.TID, data HomeVideoData) *HomeVideoRow {
 	return row
 }
 
-// Taken from the Unison demo
-func addWrappedText(parent *unison.Panel, text string, ink unison.Ink, font unison.Font, width float32) {
-	decoration := &unison.TextDecoration{Font: font}
-	var lines []*unison.Text
-	if width > 0 {
-		lines = unison.NewTextWrappedLines(text, decoration, width)
-	} else {
-		lines = unison.NewTextLines(text, decoration)
-	}
-	for _, line := range lines {
-		label := unison.NewLabel()
-		label.Font = font
-		label.LabelTheme.OnBackgroundInk = ink
-		label.SetTitle(line.String())
-		parent.AddChild(label)
-	}
+func addText(parent *unison.Panel, text string, ink unison.Ink, font unison.Font) {
+	tx := unison.NewText(text, &unison.TextDecoration{Font: font})
+	label := unison.NewLabel()
+	label.Font = font
+	label.LabelTheme.OnBackgroundInk = ink
+	label.SetTitle(tx.String())
+	parent.AddChild(label)
 }

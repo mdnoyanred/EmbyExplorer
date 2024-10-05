@@ -19,7 +19,6 @@ const inpTextSizeMin = 40
 const obscureRune = 0x2a
 
 var okButton *unison.Button
-var cancelButton *unison.Button
 var inpServer *unison.Field
 var inpPort *unison.Field
 var inpUser *unison.Field
@@ -42,7 +41,7 @@ func PreferencesDialog() {
 			saveSettings()
 			dialog.StopModal(unison.ModalResponseOK)
 		}
-		cancelButton = dialog.Button(unison.ModalResponseCancel)
+		_ = dialog.Button(unison.ModalResponseCancel)
 		s := settings.GetPreferences()
 		chkSecure.State = check.Off
 		if s.EmbySecure {
@@ -131,7 +130,7 @@ func saveSettings() {
 	_ = SavePreferences()
 }
 
-func inpModifiedCallback(_, after *unison.FieldState) {
+func inpModifiedCallback(_, _ *unison.FieldState) {
 	okButton.SetEnabled(checkOk())
 }
 

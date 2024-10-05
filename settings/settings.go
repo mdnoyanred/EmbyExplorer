@@ -35,11 +35,6 @@ func GetPreferences() Settings {
 	return settings
 }
 
-func GetPreferencesDetail() (rect unison.Rect, secure bool, server string, port string, user string, password string) {
-	return settings.WindowRect, settings.EmbySecure, settings.EmbyServer, settings.EmbyPort,
-		settings.EmbyUser, settings.EmbyPassword
-}
-
 func Valid() bool {
 	return settings.EmbyServer != "" && settings.EmbyPort != "" && settings.EmbyUser != "" && settings.EmbyPassword != "" &&
 		settings.WindowRect.Width > 0 && settings.WindowRect.Height > 0
