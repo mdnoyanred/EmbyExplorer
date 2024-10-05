@@ -33,6 +33,7 @@ var prefsBtn *unison.Button
 var authBtn *unison.Button
 var fetchBtn *unison.Button
 var detailsBtn *unison.Button
+var exportBtn *unison.Button
 
 var mainContent *unison.Panel
 var logoPanel *unison.Panel
@@ -74,11 +75,12 @@ func createSpacer(width float32, panel *unison.Panel) {
 	panel.AddChild(spacer)
 }
 
-func setFunctions(prefs bool, auth bool, fetch bool, details bool) {
+func setFunctions(prefs bool, auth bool, fetch bool, details bool, export bool) {
 	prefsBtn.SetEnabled(prefs)
 	authBtn.SetEnabled(auth)
 	fetchBtn.SetEnabled(fetch)
 	detailsBtn.SetEnabled(details)
+	exportBtn.SetEnabled(export)
 }
 
 func createToolbarPanel() *unison.Panel {
@@ -136,6 +138,13 @@ func createToolbarPanel() *unison.Panel {
 		panel.AddChild(detailsBtn)
 		detailsBtn.ClickCallback = func() { embyFetchDetails() }
 	}
+	exportBtn, err = createButton(assets.CapExport, assets.IconExport)
+	if err == nil {
+		exportBtn.SetEnabled(true)
+		exportBtn.SetFocusable(false)
+		panel.AddChild(exportBtn)
+		exportBtn.ClickCallback = func() { embyExport() }
+	}
 	return panel
 }
 
@@ -191,9 +200,7 @@ func setLogoPanel() {
 
 func switchView() {
 	collectionType = api.AllowedCollectionTypes[viewsPopupMenu.SelectedIndex()]
-	if collectionType == api.CollectionHomeVideos {
-		detailsBtn.SetEnabled(false) // no details for home videos
-	}
+	setFunctions(false, false, true, false, false)
 	setLogoPanel()
 }
 

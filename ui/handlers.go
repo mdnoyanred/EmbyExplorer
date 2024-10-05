@@ -33,7 +33,7 @@ func embyAuthenticateUser() {
 			viewsPopupMenu.AddItem(v.Name)
 			if i == 0 {
 				viewsPopupMenu.SelectIndex(i)
-				setFunctions(false, false, true, false)
+				setFunctions(false, false, true, false, false)
 			}
 		}
 	}
@@ -41,6 +41,7 @@ func embyAuthenticateUser() {
 
 func embyFetchItemsForUser() {
 	detailsBtn.SetEnabled(false)
+	exportBtn.SetEnabled(false)
 	index := viewsPopupMenu.SelectedIndex()
 	view := userViews[index]
 	dto, err := api.UserGetItenmsInt(view.Id, view.CollectionType)
@@ -56,6 +57,7 @@ func embyFetchItemsForUser() {
 		if len(movieData) > 0 {
 			models.MovieTable.SelectByIndex(0)
 			detailsBtn.SetEnabled(true)
+			exportBtn.SetEnabled(true)
 		}
 	case api.CollectionTVShows:
 		tvshowData = api.GetTVShowDisplayData(dto)
@@ -63,12 +65,14 @@ func embyFetchItemsForUser() {
 		if len(tvshowData) > 0 {
 			models.TVShowTable.SelectByIndex(0)
 			detailsBtn.SetEnabled(true)
+			exportBtn.SetEnabled(true)
 		}
 	case api.CollectionHomeVideos:
 		homevideoData = api.GetHomeVideoDisplayData(dto)
 		newHomeVideoTable(mainContent, homevideoData)
 		if len(homevideoData) > 0 {
 			models.HomeVideoTable.SelectByIndex(0)
+			exportBtn.SetEnabled(true)
 		}
 	default:
 	}
@@ -77,4 +81,8 @@ func embyFetchItemsForUser() {
 func embyFetchDetails() {
 	canDisplayDetails = true
 	detailsWindowDisplay()
+}
+
+func embyExport() {
+
 }

@@ -22,6 +22,7 @@ const (
 	CapPassword     = "Emby Password"
 	CapSecure       = "Use https protocol"
 	CapDetails      = "Details"
+	CapExport       = "Export"
 )
 
 const (

@@ -21,3 +21,6 @@ var IconDetails string
 
 //go:embed emby.svg
 var EmbyLogo string
+
+//go:embed export.svg
+var IconExport string
