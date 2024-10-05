@@ -1,5 +1,7 @@
-// (w) 2024 by Jan Buchholz.
+// ---------------------------------------------------------------------------------------------------------------------
+// (w) 2024 by Jan Buchholz
 // Emby REST API
+// ---------------------------------------------------------------------------------------------------------------------
 
 package api
 
@@ -17,6 +19,7 @@ const (
 	substHostname = "$hostname"
 	substPort     = "$port"
 	substUserId   = "$userid"
+	substItemId   = "$itemid"
 )
 
 const (
@@ -29,6 +32,7 @@ const (
 	POSTAuthenticateUser = "/Users/AuthenticateByName"
 	GETViews             = "/Users/" + substUserId + "/Views"
 	GETItems             = "/Users/" + substUserId + "/Items"
+	GETImages            = "/Items/" + substItemId + "/Images"
 )
 
 // Fields for auth. request
@@ -52,6 +56,9 @@ const (
 	paraParentId  = "ParentId="
 	paraRecursive = "Recursive="
 	paraFields    = "Fields="
+	paraFormat    = "format="
+	paraMaxWidth  = "MaxWidth="
+	paraMaxHeight = "MaxHeight="
 	apiKey        = "api_key="
 )
 
@@ -62,7 +69,7 @@ const (
 	CollectionHomeVideos = "homevideos"
 )
 
-var allowedCollectionTypes = []string{CollectionMovies, CollectionTVShows, CollectionHomeVideos}
+var AllowedCollectionTypes = []string{CollectionMovies, CollectionTVShows, CollectionHomeVideos}
 
 // Emby item types
 const (
@@ -96,6 +103,15 @@ type UserView struct {
 	Id             string
 }
 
+type ImageFormat string
+
+const (
+	ImageFormatBmp ImageFormat = "bmp"
+	ImageFormatGif ImageFormat = "gif"
+	ImageFormatJpp ImageFormat = "jpp"
+	ImageFormatPng ImageFormat = "png"
+)
+
 var BasicUrl string
 var EmbySession AuthenticationResult
 var embyPreferences emby
@@ -124,9 +140,16 @@ func CreateRestUrl(endpoint string) string {
 	return BasicUrl + endpoint
 }
 
-func CreateRestUrlForUser(endpoint string, id string) string {
+func CreateRestUrlForUser(endpoint string, userid string) string {
 	url := CreateRestUrl(endpoint)
-	url = strings.Replace(url, substUserId, id, 1)
+	url = strings.Replace(url, substUserId, userid, 1)
+	return url
+}
+
+func CreateRestUrlForPrimaryImage(endpoint string, itemid string) string {
+	url := CreateRestUrl(endpoint)
+	url = strings.Replace(url, substItemId, itemid, 1)
+	url = url + "/" + string(PRIMARY_ImageType) + "/0"
 	return url
 }
 
@@ -193,10 +216,10 @@ func AuthenticateUserByCredentials(username string, password string) error {
 	return nil
 }
 
-func UserGetViews(id string, accesstoken string) ([]UserView, error) {
+func UserGetViews(userid string, accesstoken string) ([]UserView, error) {
 	var userViews = make([]UserView, 0)
 	result := QueryResultBaseItemDto{}
-	url := CreateRestUrlForUser(GETViews, id)
+	url := CreateRestUrlForUser(GETViews, userid)
 	url = url + "?" + apiKey + accesstoken
 	response, err := http.Get(url)
 	if err != nil {
@@ -212,7 +235,7 @@ func UserGetViews(id string, accesstoken string) ([]UserView, error) {
 		return userViews, err
 	}
 	for _, item := range result.Items {
-		for _, collectionType := range allowedCollectionTypes {
+		for _, collectionType := range AllowedCollectionTypes {
 			if item.CollectionType == collectionType {
 				var v = UserView{
 					Name:           item.Name,
@@ -227,10 +250,10 @@ func UserGetViews(id string, accesstoken string) ([]UserView, error) {
 	return userViews, nil
 }
 
-func UserGetItenms(id string, collectionid string, collectiontype string, accesstoken string) ([]BaseItemDto, error) {
+func UserGetItems(userid string, collectionid string, collectiontype string, accesstoken string) ([]BaseItemDto, error) {
 	var tmp QueryResultBaseItemDto
 	var result = make([]BaseItemDto, 0)
-	url := CreateRestUrlForUser(GETItems, id)
+	url := CreateRestUrlForUser(GETItems, userid)
 	url = url + "?" + apiKey + accesstoken
 	url = url + "&" + paraRecursive + "true"
 	url = url + "&" + paraParentId + collectionid
@@ -268,6 +291,30 @@ func UserGetItenms(id string, collectionid string, collectiontype string, access
 	return result, nil
 }
 
+func GetPrimaryImageForItem(itemid string, format ImageFormat, maxwidth string, maxheight string, accesstoken string) ([]byte, error) {
+	url := CreateRestUrlForPrimaryImage(GETImages, itemid)
+	url = url + "?" + apiKey + accesstoken
+	if format == ImageFormatBmp || format == ImageFormatGif || format == ImageFormatJpp || format == ImageFormatPng {
+		url = url + "&" + paraFormat + string(format)
+	}
+	if maxwidth != "" {
+		url = url + "&" + paraMaxWidth + maxwidth
+	}
+	if maxheight != "" {
+		url = url + "&" + paraMaxHeight + maxheight
+	}
+	response, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+	if err == nil {
+		return body, nil
+	}
+	return nil, err
+}
+
 func AuthenticateUserInt() error {
 	return AuthenticateUserByCredentials(embyPreferences.EmbyUser, embyPreferences.EmbyPassword)
 }
@@ -277,7 +324,11 @@ func UserGetViewsInt() ([]UserView, error) {
 }
 
 func UserGetItenmsInt(collectionid string, collectiontype string) ([]BaseItemDto, error) {
-	return UserGetItenms(EmbySession.User.Id, collectionid, collectiontype, EmbySession.AccessToken)
+	return UserGetItems(EmbySession.User.Id, collectionid, collectiontype, EmbySession.AccessToken)
+}
+
+func GetPrimaryImageForItemInt(itemid string, format ImageFormat, maxwidth string, maxheight string) ([]byte, error) {
+	return GetPrimaryImageForItem(itemid, format, maxwidth, maxheight, EmbySession.AccessToken)
 }
 
 func createPair(key string, value string) string {
@@ -285,10 +336,10 @@ func createPair(key string, value string) string {
 	return key + "=" + qu + value + qu
 }
 
-func createHeader(id string) string {
+func createHeader(userid string) string {
 	var h string
 	host, _ := os.Hostname()
-	h = authType + " " + createPair(authKeyUserId, id) + ", " + createPair(authKeyClient, "PC") + ", " +
+	h = authType + " " + createPair(authKeyUserId, userid) + ", " + createPair(authKeyClient, "PC") + ", " +
 		createPair(authKeyDevice, runtime.GOOS) + ", " + createPair(authKeyDeviceId, host) + ", " +
 		createPair(authKeyVersion, "1.0.0.0")
 	return h

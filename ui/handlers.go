@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // Event handlers
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -9,7 +9,6 @@ import (
 	"Emby_Explorer/api"
 	"Emby_Explorer/assets"
 	"Emby_Explorer/models"
-	"fmt"
 )
 
 var userViews []api.UserView
@@ -34,13 +33,14 @@ func embyAuthenticateUser() {
 			viewsPopupMenu.AddItem(v.Name)
 			if i == 0 {
 				viewsPopupMenu.SelectIndex(i)
-				setFunctions(false, false, true, true)
+				setFunctions(false, false, true, false)
 			}
 		}
 	}
 }
 
 func embyFetchItemsForUser() {
+	detailsBtn.SetEnabled(false)
 	index := viewsPopupMenu.SelectedIndex()
 	view := userViews[index]
 	dto, err := api.UserGetItenmsInt(view.Id, view.CollectionType)
@@ -55,12 +55,14 @@ func embyFetchItemsForUser() {
 		newMovieTable(mainContent, movieData)
 		if len(movieData) > 0 {
 			models.MovieTable.SelectByIndex(0)
+			detailsBtn.SetEnabled(true)
 		}
 	case api.CollectionTVShows:
 		tvshowData = api.GetTVShowDisplayData(dto)
 		newTVShowTable(mainContent, tvshowData)
 		if len(tvshowData) > 0 {
 			models.TVShowTable.SelectByIndex(0)
+			detailsBtn.SetEnabled(true)
 		}
 	case api.CollectionHomeVideos:
 		homevideoData = api.GetHomeVideoDisplayData(dto)
@@ -73,27 +75,6 @@ func embyFetchItemsForUser() {
 }
 
 func embyFetchDetails() {
-	if len(userViews) > 0 {
-		index := viewsPopupMenu.SelectedIndex()
-		view := userViews[index]
-		switch view.CollectionType {
-		case api.CollectionMovies:
-			movie := models.MovieTable.SelectedRows(true)
-			for _, mo := range movie {
-				fmt.Println(mo.M.Overview)
-				break
-			}
-		case api.CollectionTVShows:
-			tvshow := models.TVShowTable.SelectedRows(true)
-			for _, tv := range tvshow {
-				if tv.M.Type_ == api.EpisodeType {
-					fmt.Println(tv.M.Overview)
-					break
-				}
-			}
-		case api.CollectionHomeVideos:
-
-		default:
-		}
-	}
+	canDisplayDetails = true
+	detailsWindowDisplay()
 }

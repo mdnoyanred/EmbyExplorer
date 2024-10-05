@@ -14,6 +14,7 @@ type (
 	DynamicDayOfWeek         string
 	ExtendedVideoTypes       string
 	ExtendedVideoSubTypes    string
+	ImageType                string
 	LiveTvTimerType          string
 	LocationType             string
 	MarkerType               string
@@ -50,6 +51,10 @@ const (
 const (
 	ACTOR_PersonType    PersonType = "Actor"
 	DIRECTOR_PersonType PersonType = "Director"
+)
+
+const (
+	PRIMARY_ImageType ImageType = "Primary"
 )
 
 // A

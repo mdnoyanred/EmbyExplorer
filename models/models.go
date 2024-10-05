@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz.
+// (w) 2024 by Jan Buchholz
 // Data models for Emby Movies, TV Shows and Home Videos, according to Unison's table model
 // Using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
@@ -48,6 +48,7 @@ type MovieData struct {
 	Resolution     string
 	Path           string
 	Overview       string
+	MovieId        string
 }
 
 type MovieRow struct {
@@ -184,7 +185,7 @@ func NewMovieRow(id tid.TID, data MovieData) *MovieRow {
 		M: MovieData{data.Name, data.OriginalTitle, data.ProductionYear,
 			data.Runtime, data.Actors, data.Directors, data.Studios,
 			data.Genres, data.Container, data.Codecs, data.Resolution,
-			data.Path, data.Overview},
+			data.Path, data.Overview, data.MovieId},
 	}
 	return row
 }
@@ -217,9 +218,9 @@ type TVShowData struct {
 	Resolution     string
 	Path           string
 	Overview       string
-	SeriesID       string
-	SeasonID       string
-	EpisodeID      string
+	SeriesId       string
+	SeasonId       string
+	EpisodeId      string
 	Type_          string
 	SortIndex      int32
 }
@@ -331,7 +332,7 @@ func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 		M: TVShowData{data.Name, data.Episode, data.Season, data.ProductionYear,
 			data.Runtime, data.Actors, data.Studios, data.Genres, data.Container,
 			data.Codecs, data.Resolution, data.Path, data.Overview,
-			data.SeriesID, data.SeasonID, data.EpisodeID, data.Type_,
+			data.SeriesId, data.SeasonId, data.EpisodeId, data.Type_,
 			data.SortIndex},
 	}
 	return row

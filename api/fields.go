@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // Evaluation of Emby DTO & mapping fields to display structures
 // Resolve dependencies for TV shows
 // ---------------------------------------------------------------------------------------------------------------------
@@ -38,6 +38,7 @@ func GetMovieDisplayData(dto []BaseItemDto) []models.MovieData {
 	result := make([]models.MovieData, 0)
 	var movie models.MovieData
 	for _, d := range dto {
+		movie.MovieId = d.Id
 		movie.Name = d.Name
 		movie.OriginalTitle = d.OriginalTitle
 		movie.ProductionYear = strconv.Itoa(int(d.ProductionYear))
@@ -70,20 +71,20 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			item.Genres = evalGenres(d.Genres)
 			item.Studios = evalStudios(d.Studios)
 			item.Path = d.Path
-			item.SeriesID = d.Id
+			item.SeriesId = d.Id
 			item.Type_ = d.Type_
 			series = append(series, item)
 		case SeasonType:
 			item.Season = d.Name
-			item.SeriesID = d.SeriesId
-			item.SeasonID = d.Id
+			item.SeriesId = d.SeriesId
+			item.SeasonId = d.Id
 			item.SortIndex = d.IndexNumber
 			item.Path = d.Path
 			item.Type_ = d.Type_
 			seasons = append(seasons, item)
 		case EpisodeType:
 			item.Episode = d.Name
-			item.EpisodeID = d.Id
+			item.EpisodeId = d.Id
 			item.Runtime = evalRuntime(d.RunTimeTicks)
 			item.Container = d.Container
 			item.Codecs = evalCodecs(d.MediaSources)
@@ -93,8 +94,8 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			item.SortIndex = d.IndexNumber
 			item.Path = d.Path
 			item.Overview = d.Overview
-			item.SeriesID = d.SeriesId
-			item.SeasonID = d.SeasonId
+			item.SeriesId = d.SeriesId
+			item.SeasonId = d.SeasonId
 			item.Type_ = d.Type_
 			episodes = append(episodes, item)
 		default:
@@ -106,18 +107,18 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 	})
 	// Sort seasons by series
 	sort.Slice(seasons, func(i, j int) bool {
-		return seasons[i].SeriesID < seasons[j].SeriesID
+		return seasons[i].SeriesId < seasons[j].SeriesId
 	})
 	// Sort episodes by series
 	sort.Slice(episodes, func(i, j int) bool {
-		return episodes[i].SeriesID < episodes[j].SeriesID
+		return episodes[i].SeriesId < episodes[j].SeriesId
 	})
 	for _, s := range series {
 		result = append(result, s)
 		seasonstmp := make([]models.TVShowData, 0)
 		// Find seasons for series
 		for _, season := range seasons {
-			if season.SeriesID == s.SeriesID {
+			if season.SeriesId == s.SeriesId {
 				seasonstmp = append(seasonstmp, season)
 			}
 		}
@@ -129,7 +130,7 @@ func GetTVShowDisplayData(dto []BaseItemDto) []models.TVShowData {
 			// Find episodes for series and season
 			episodesstmp := make([]models.TVShowData, 0)
 			for _, episode := range episodes {
-				if episode.SeriesID == n.SeriesID && episode.SeasonID == n.SeasonID {
+				if episode.SeriesId == n.SeriesId && episode.SeasonId == n.SeasonId {
 					episodesstmp = append(episodesstmp, episode)
 				}
 			}

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // UI MainWindow, using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
 // ---------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ func installDefaultMenus(wnd *unison.Window) {
 
 func installCallbacks() {
 	viewsPopupMenu.SelectionChangedCallback = func(popup *unison.PopupMenu[string]) {
-		setLogoPanel()
+		switchView()
 	}
 	mainWindow.AllowCloseCallback = func() bool {
 		return mainWindowAllowClose()

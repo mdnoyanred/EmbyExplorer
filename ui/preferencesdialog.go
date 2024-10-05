@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // Emby preferences dialog, using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // Dialogs, using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,8 +37,8 @@ func newAboutPanel() *unison.Panel {
 		HSpacing: unison.StdHSpacing,
 		VSpacing: unison.StdVSpacing,
 	})
-	breakTextIntoLabels(panel, assets.TxtAboutEmbyExplorer, unison.LabelFont.Face().Font(10), false)
-	breakTextIntoLabels(panel, assets.TxtAboutUnison, unison.LabelFont.Face().Font(10), false)
+	breakTextIntoLabels(panel, assets.TxtAboutEmbyExplorer, unison.LabelFont.Face().Font(10), false, true)
+	breakTextIntoLabels(panel, assets.TxtAboutUnison, unison.LabelFont.Face().Font(10), false, true)
 	panel.SetLayoutData(&unison.FlexLayoutData{
 		MinSize: unison.Size{Width: 500},
 		HSpan:   1,
@@ -49,7 +49,7 @@ func newAboutPanel() *unison.Panel {
 }
 
 // taken (and slightly modifield) from Unison dialog.go
-func breakTextIntoLabels(panel *unison.Panel, text string, font unison.Font, addSpaceAbove bool) {
+func breakTextIntoLabels(panel *unison.Panel, text string, font unison.Font, addSpaceAbove bool, center bool) {
 	if text != "" {
 		returns := 0
 		for {
@@ -62,13 +62,15 @@ func breakTextIntoLabels(panel *unison.Panel, text string, font unison.Font, add
 					l := unison.NewLabel()
 					l.Font = font
 					l.SetTitle(part)
-					l.SetLayoutData(&unison.FlexLayoutData{
-						HSpan:  1,
-						VSpan:  1,
-						HAlign: align.Middle,
-						VAlign: align.Middle,
-						HGrab:  true,
-					})
+					if center {
+						l.SetLayoutData(&unison.FlexLayoutData{
+							HSpan:  1,
+							VSpan:  1,
+							HAlign: align.Middle,
+							VAlign: align.Middle,
+							HGrab:  true,
+						})
+					}
 					if returns > 1 || addSpaceAbove {
 						addSpaceAbove = false
 						l.SetBorder(unison.NewEmptyBorder(unison.Insets{Top: unison.StdHSpacing}))
@@ -82,13 +84,15 @@ func breakTextIntoLabels(panel *unison.Panel, text string, font unison.Font, add
 					l := unison.NewLabel()
 					l.Font = font
 					l.SetTitle(text)
-					l.SetLayoutData(&unison.FlexLayoutData{
-						HSpan:  1,
-						VSpan:  1,
-						HAlign: align.Middle,
-						VAlign: align.Middle,
-						HGrab:  true,
-					})
+					if center {
+						l.SetLayoutData(&unison.FlexLayoutData{
+							HSpan:  1,
+							VSpan:  1,
+							HAlign: align.Middle,
+							VAlign: align.Middle,
+							HGrab:  true,
+						})
+					}
 					if returns > 1 || addSpaceAbove {
 						l.SetBorder(unison.NewEmptyBorder(unison.Insets{Top: unison.StdHSpacing}))
 					}

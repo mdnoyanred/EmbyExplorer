@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------
-// (w) 2024 by Jan Buchholz. No rights reserved.
+// (w) 2024 by Jan Buchholz
 // UI, table panels & utilities
 // Using Unison library (c) Richard A. Wilkes
 // https://github.com/richardwilkes/unison
@@ -8,6 +8,7 @@
 package ui
 
 import (
+	"Emby_Explorer/api"
 	"Emby_Explorer/assets"
 	"Emby_Explorer/models"
 	"github.com/richardwilkes/toolbox/tid"
@@ -23,6 +24,8 @@ const (
 	toolbarFontSize  float32 = 9
 	viewsPopupWidth          = 150
 	viewsPopupHeight         = 20
+	coverMaxWidth            = "300"
+	coverMaxHeight           = "300"
 )
 
 var viewsPopupMenu *unison.PopupMenu[string]
@@ -34,6 +37,8 @@ var detailsBtn *unison.Button
 var mainContent *unison.Panel
 var logoPanel *unison.Panel
 var tableScrollArea *unison.ScrollPanel
+var collectionType = ""
+var canDisplayDetails = false
 
 func newSVGButton(svg *unison.SVG) *unison.Button {
 	btn := unison.NewButton()
@@ -184,6 +189,14 @@ func setLogoPanel() {
 	}
 }
 
+func switchView() {
+	collectionType = api.AllowedCollectionTypes[viewsPopupMenu.SelectedIndex()]
+	if collectionType == api.CollectionHomeVideos {
+		detailsBtn.SetEnabled(false) // no details for home videos
+	}
+	setLogoPanel()
+}
+
 func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 	models.MovieTable = unison.NewTable[*models.MovieRow](&unison.SimpleTableModel[*models.MovieRow]{})
 	models.MovieTable.Columns = make([]unison.ColumnInfo, models.MovieTableDescription.NoOfColumns)
@@ -227,6 +240,11 @@ func newMovieTable(content *unison.Panel, movieData []models.MovieData) {
 		VGrab:  true,
 	})
 	tableScrollArea.SetColumnHeader(header)
+	models.MovieTable.SelectionChangedCallback = func() {
+		if canDisplayDetails {
+			detailsWindowDisplay()
+		}
+	}
 	content.AddChild(tableScrollArea)
 }
 
@@ -273,6 +291,11 @@ func newTVShowTable(content *unison.Panel, tvshowData []models.TVShowData) {
 		VGrab:  true,
 	})
 	tableScrollArea.SetColumnHeader(header)
+	models.TVShowTable.SelectionChangedCallback = func() {
+		if canDisplayDetails {
+			detailsWindowDisplay()
+		}
+	}
 	content.AddChild(tableScrollArea)
 }
 
@@ -315,4 +338,14 @@ func newHomeVideoTable(content *unison.Panel, homevideoData []models.HomeVideoDa
 	})
 	tableScrollArea.SetColumnHeader(header)
 	content.AddChild(tableScrollArea)
+}
+
+func newImageFromBytes(itemid string) (*unison.Image, error) {
+	var newImage *unison.Image
+	image, err := api.GetPrimaryImageForItemInt(itemid, api.ImageFormatPng, coverMaxWidth, coverMaxHeight)
+	if err != nil {
+		return nil, err
+	}
+	newImage, err = unison.NewImageFromBytes(image, 1)
+	return newImage, nil
 }
