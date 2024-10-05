@@ -1,6 +1,6 @@
 module Emby_Explorer
 
-go 1.23.1
+go 1.23.2
 
 require github.com/richardwilkes/unison v0.74.0
 
