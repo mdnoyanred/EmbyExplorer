@@ -166,6 +166,9 @@ func FindUserIdByName(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if response.StatusCode != statusCodeOK {
+		return "", errors.New(response.Status)
+	}
 	defer response.Body.Close()
 	body, err = io.ReadAll(response.Body)
 	if err != nil {
