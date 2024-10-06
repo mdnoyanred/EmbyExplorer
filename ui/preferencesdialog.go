@@ -7,6 +7,7 @@
 package ui
 
 import (
+	"Emby_Explorer/api"
 	"Emby_Explorer/assets"
 	"Emby_Explorer/settings"
 	"github.com/richardwilkes/unison"
@@ -50,7 +51,7 @@ func PreferencesDialog() {
 		inpServer.SetText(s.EmbyServer)
 		inpPort.SetText(s.EmbyPort)
 		inpUser.SetText(s.EmbyUser)
-		inpPassword.SetText(s.EmbyPassword)
+		inpPassword.SetText(string(s.EmbyPassword))
 		okButton.SetEnabled(checkOk())
 		dialog.RunModal()
 	}
@@ -128,6 +129,11 @@ func saveSettings() {
 	settings.SetPreferencesDetail(mainWindow.FrameRect(), chkSecure.State == check.On, inpServer.Text(),
 		inpPort.Text(), inpUser.Text(), inpPassword.Text())
 	_ = SavePreferences()
+	if settings.Valid() {
+		// must update emby session parameters for REST api
+		s := settings.GetPreferences()
+		api.InitApiPreferences(s.EmbySecure, s.EmbyServer, s.EmbyPort, s.EmbyUser, string(s.EmbyPassword))
+	}
 }
 
 func inpModifiedCallback(_, _ *unison.FieldState) {

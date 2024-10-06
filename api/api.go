@@ -8,6 +8,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -81,6 +82,8 @@ const (
 	MovieType   = "Movie"
 	FolderType  = "Folder"
 )
+
+const statusCodeOK = 200
 
 // Body for auth. REST call
 type authBody struct {
@@ -193,16 +196,19 @@ func AuthenticateUserByCredentials(username string, password string) error {
 	}
 	url := CreateRestUrl(POSTAuthenticateUser)
 	header := createHeader(id)
-	client := &http.Client{}
+	clnt := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jbody))
 	if err != nil {
 		return err
 	}
 	req.Header.Add(contentType, contentTypeJSON)
 	req.Header.Add(authHeader, header)
-	response, err := client.Do(req)
+	response, err := clnt.Do(req)
 	if err != nil {
 		return err
+	}
+	if response.StatusCode != statusCodeOK {
+		return errors.New(response.Status)
 	}
 	defer response.Body.Close()
 	responseBody, err := io.ReadAll(response.Body)
@@ -224,7 +230,10 @@ func UserGetViews(userid string, accesstoken string) ([]UserView, error) {
 	url = url + "?" + apiKey + accesstoken
 	response, err := http.Get(url)
 	if err != nil {
-		return userViews, err
+		return nil, err
+	}
+	if response.StatusCode != statusCodeOK {
+		return nil, errors.New(response.Status)
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
@@ -233,7 +242,7 @@ func UserGetViews(userid string, accesstoken string) ([]UserView, error) {
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return userViews, err
+		return nil, err
 	}
 	for _, item := range result.Items {
 		for _, collectionType := range AllowedCollectionTypes {
@@ -261,16 +270,19 @@ func UserGetItems(userid string, collectionid string, collectiontype string, acc
 	url = url + "&" + paraFields + GetFields(collectiontype) //fields to fetch
 	response, err := http.Get(url)
 	if err != nil {
-		return result, err
+		return nil, err
+	}
+	if response.StatusCode != statusCodeOK {
+		return nil, errors.New(response.Status)
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 	err = json.Unmarshal(body, &tmp)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 	for _, item := range tmp.Items {
 		switch collectiontype {
@@ -307,6 +319,9 @@ func GetPrimaryImageForItem(itemid string, format ImageFormat, maxwidth string, 
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
+	}
+	if response.StatusCode != statusCodeOK {
+		return nil, errors.New(response.Status)
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)

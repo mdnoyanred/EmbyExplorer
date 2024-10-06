@@ -32,6 +32,16 @@ const (
 )
 
 const (
+	CapMovies     = "Movies"
+	CapTVShows    = "TV Shows"
+	CapHomeVideos = "Home Videos"
+	CapEmby       = "Emby"
+)
+
+const FileExtension = "xlsx"
+
+const (
 	TxtAboutEmbyExplorer = "Emby Explorer (w) 2024 by Jan Buchholz\nhttps://github.com/SideFx/EmbyExplorer"
-	TxtAboutUnison       = "\n\nCredits:\nEmby Explorer has been developed using Richard A. Wilkes' Unison library:\nhttps://github.com/richardwilkes/unison"
+	TxtAboutUnison       = "\n\nCredits:\nEmby Explorer uses the following libraries:\nUnison by Richard A. Wilkes\nhttps://github.com/richardwilkes/unison"
+	TxtAboutExcelize     = "\nExcelize\nhttps://xuri.me/excelize/\nhttps://github.com/qax-os/excelize"
 )

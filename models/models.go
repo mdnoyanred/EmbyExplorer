@@ -14,11 +14,21 @@ import (
 	"github.com/richardwilkes/unison"
 )
 
+type ColumnDescription struct {
+	Caption        string
+	XLSColumn      string
+	XLSColumnWidth float64
+}
+
 type TableDescription struct {
 	NoOfColumns int
-	Captions    []string
 	APIFields   string
+	Columns     []ColumnDescription
 }
+
+var MovieDataTable []MovieData
+var TVShowDataTable []TVShowData
+var HomeVideoDataTable []HomeVideoData
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Movies model
@@ -28,10 +38,22 @@ var _ unison.TableRowData[*MovieRow] = &MovieRow{}
 var MovieTable *unison.Table[*MovieRow]
 var MovieTableDescription = TableDescription{
 	NoOfColumns: 12, //displayed columns only
-	Captions: []string{"Title", "Original Title", "Year", "Time", "Actors", "Director", "Studio", "Genre", "Ext.",
-		"Codec", "Resolution", "Path"},
 	APIFields: "Name,OriginalTitle,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container," +
 		"Overview,RunTimeTicks,Type_", //no spaces here!
+	Columns: []ColumnDescription{
+		{"Title", "A", 70},
+		{"Original Title", "B", 70},
+		{"Year", "C", 10},
+		{"Time", "D", 10},
+		{"Actors", "E", 100},
+		{"Director", "F", 50},
+		{"Studio", "G", 30},
+		{"Genre", "H", 70},
+		{"Ext.", "I", 10},
+		{"Codec", "J", 20},
+		{"Resolution", "K", 15},
+		{"Path", "L", 80},
+	},
 }
 
 type MovieData struct {
@@ -189,6 +211,37 @@ func NewMovieRow(id tid.TID, data MovieData) *MovieRow {
 	return row
 }
 
+func GetMovieDataField(index int, structure MovieData) string {
+	switch index {
+	case 0:
+		return structure.Name
+	case 1:
+		return structure.OriginalTitle
+	case 2:
+		return structure.ProductionYear
+	case 3:
+		return structure.Runtime
+	case 4:
+		return structure.Actors
+	case 5:
+		return structure.Directors
+	case 6:
+		return structure.Studios
+	case 7:
+		return structure.Genres
+	case 8:
+		return structure.Container
+	case 9:
+		return structure.Codecs
+	case 10:
+		return structure.Resolution
+	case 11:
+		return structure.Path
+	default:
+		return ""
+	}
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // TV shows model
 // ---------------------------------------------------------------------------------------------------------------------
@@ -197,10 +250,22 @@ var _ unison.TableRowData[*TVShowRow] = &TVShowRow{}
 var TVShowTable *unison.Table[*TVShowRow]
 var TVShowTableDescription = TableDescription{
 	NoOfColumns: 12, //displayed columns only
-	Captions: []string{"Series", "Episode", "Season", "Year", "Time", "Actors", "Studio", "Genre", "Ext.", "Codec",
-		"Resolution", "Path"},
 	APIFields: "Name,MediaSources,Path,Genres,ProductionYear,People,Studios,Width,Height,Container,RunTimeTicks," +
 		"Overview,SeriesId,SeasonId,Id,ParentId,IndexNumber,Type_", //no spaces here!
+	Columns: []ColumnDescription{
+		{"Series", "A", 50},
+		{"Episode", "B", 50},
+		{"Season", "C", 30},
+		{"Year", "D", 10},
+		{"Time", "E", 10},
+		{"Actors", "F", 100},
+		{"Studio", "G", 30},
+		{"Genre", "H", 70},
+		{"Ext.", "I", 10},
+		{"Codec", "J", 20},
+		{"Resolution", "K", 15},
+		{"Path", "L", 80},
+	},
 }
 
 type TVShowData struct {
@@ -336,6 +401,37 @@ func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 	return row
 }
 
+func GetTVShowDataField(index int, structure TVShowData) string {
+	switch index {
+	case 0:
+		return structure.Name
+	case 1:
+		return structure.Episode
+	case 2:
+		return structure.Season
+	case 3:
+		return structure.ProductionYear
+	case 4:
+		return structure.Runtime
+	case 5:
+		return structure.Actors
+	case 6:
+		return structure.Studios
+	case 7:
+		return structure.Genres
+	case 8:
+		return structure.Container
+	case 9:
+		return structure.Codecs
+	case 10:
+		return structure.Resolution
+	case 11:
+		return structure.Path
+	default:
+		return ""
+	}
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Home videos model
 // ---------------------------------------------------------------------------------------------------------------------
@@ -343,9 +439,17 @@ func NewTVShowRow(id tid.TID, data TVShowData) *TVShowRow {
 var _ unison.TableRowData[*HomeVideoRow] = &HomeVideoRow{}
 var HomeVideoTable *unison.Table[*HomeVideoRow]
 var HomeVideoTableDescription = TableDescription{
-	NoOfColumns: 7, //displayed columns only
-	Captions:    []string{"Title", "Folder", "Time", "Ext.", "Codec", "Resolution", "Path"},
+	NoOfColumns: 7,                                                                           //displayed columns only
 	APIFields:   "Name,MediaSources,Path,Width,Height,Container,RunTimeTicks,ParentId,Type_", //no spaces here!
+	Columns: []ColumnDescription{
+		{"Title", "A", 100},
+		{"Folder", "B", 30},
+		{"Time", "C", 10},
+		{"Ext.", "D", 10},
+		{"Codec", "E", 20},
+		{"Resolution", "F", 15},
+		{"Path", "G", 150},
+	},
 }
 
 type HomeVideoData struct {
@@ -474,6 +578,27 @@ func NewHomeVideoRow(id tid.TID, data HomeVideoData) *HomeVideoRow {
 			data.Resolution, data.Path, data.FolderId, data.ParentId},
 	}
 	return row
+}
+
+func GetHomeVideoDataField(index int, structure HomeVideoData) string {
+	switch index {
+	case 0:
+		return structure.Name
+	case 1:
+		return structure.Folder
+	case 2:
+		return structure.Runtime
+	case 3:
+		return structure.Container
+	case 4:
+		return structure.Codecs
+	case 5:
+		return structure.Resolution
+	case 6:
+		return structure.Path
+	default:
+		return ""
+	}
 }
 
 func addText(parent *unison.Panel, text string, ink unison.Ink, font unison.Font) {

@@ -18,6 +18,8 @@ const preferencesFileName = "org.janbuchholz.embyexplorer.json"
 
 func SavePreferences() error {
 	s := settings.GetPreferences()
+	p := s.EmbyPassword
+	s.EmbyPassword = encode(p)
 	j, err := json.Marshal(s)
 	if err == nil {
 		dir, _ := os.UserConfigDir()
@@ -32,6 +34,7 @@ func SavePreferences() error {
 		err = os.WriteFile(fname, j, 0644)
 	}
 	if err == nil {
+		s.EmbyPassword = p
 		settings.SetPreferences(s)
 	}
 	return err
@@ -49,7 +52,48 @@ func LoadPreferences() error {
 		err = json.Unmarshal(byteValue, &s)
 	}
 	if err == nil {
+		s.EmbyPassword = decode(s.EmbyPassword)
 		settings.SetPreferences(s)
 	}
 	return err
+}
+
+const bits = 8
+
+func encode(b []byte) []byte {
+	var c = make([]byte, len(b))
+	copy(c, b)
+	j := 0
+	for i, e := range c {
+		i++
+		if i > bits-1 {
+			i = 1
+		}
+		c[j] = ror(e, i)
+		j++
+	}
+	return c
+}
+
+func decode(b []byte) []byte {
+	var c = make([]byte, len(b))
+	copy(c, b)
+	j := 0
+	for i, d := range c {
+		i++
+		if i > bits-1 {
+			i = 1
+		}
+		c[j] = rol(d, i)
+		j++
+	}
+	return c
+}
+
+func ror(x byte, n int) byte {
+	return (x >> n) | (x << (bits - n))
+}
+
+func rol(x byte, n int) byte {
+	return (x << n) | (x >> (bits - n))
 }

@@ -39,6 +39,7 @@ func newAboutPanel() *unison.Panel {
 	})
 	breakTextIntoLabels(panel, assets.TxtAboutEmbyExplorer, unison.LabelFont.Face().Font(10), false, true)
 	breakTextIntoLabels(panel, assets.TxtAboutUnison, unison.LabelFont.Face().Font(10), false, true)
+	breakTextIntoLabels(panel, assets.TxtAboutExcelize, unison.LabelFont.Face().Font(10), false, true)
 	panel.SetLayoutData(&unison.FlexLayoutData{
 		MinSize: unison.Size{Width: 500},
 		HSpan:   1,

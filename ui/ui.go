@@ -61,7 +61,7 @@ func NewMainWindow() error {
 	mainWindow.SetFrameRect(rect)
 	v := settings.Valid()
 	if v {
-		api.InitApiPreferences(prefs.EmbySecure, prefs.EmbyServer, prefs.EmbyPort, prefs.EmbyUser, prefs.EmbyPassword)
+		api.InitApiPreferences(prefs.EmbySecure, prefs.EmbyServer, prefs.EmbyPort, prefs.EmbyUser, string(prefs.EmbyPassword))
 	}
 	setFunctions(true, v, false, false, false)
 	mainWindow.ToFront()
