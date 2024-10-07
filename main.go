@@ -22,8 +22,5 @@ func main() {
 		unison.QuitAfterLastWindowClosedCallback(func() bool {
 			return true
 		}),
-		unison.AllowQuitCallback(func() bool {
-			return ui.AllowQuitCallback()
-		}),
 	)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	wndMinWidth  float32 = 640
+	wndMinWidth  float32 = 768
 	wndMinHeight float32 = 480
 )
 
@@ -78,16 +78,21 @@ func installCallbacks() {
 	viewsPopupMenu.SelectionChangedCallback = func(popup *unison.PopupMenu[string]) {
 		switchView()
 	}
-	mainWindow.AllowCloseCallback = func() bool {
-		return mainWindowAllowClose()
+	mainWindow.MinMaxContentSizeCallback = func() (minSize, maxSize unison.Size) {
+		return windowMinMaxResizeCallback()
 	}
 	mainWindow.WillCloseCallback = func() {
 		mainWindowWillClose()
 	}
 }
 
-func mainWindowAllowClose() bool {
-	return true
+func windowMinMaxResizeCallback() (minSize, maxSize unison.Size) {
+	var _min, _max unison.Size
+	_min = unison.NewSize(wndMinWidth, wndMinHeight)
+	disp := unison.PrimaryDisplay()
+	_max.Width = disp.Usable.Width
+	_max.Height = disp.Usable.Height
+	return _min, _max
 }
 
 func mainWindowWillClose() {
@@ -96,9 +101,4 @@ func mainWindowWillClose() {
 	prefs.WindowRect = rect
 	settings.SetPreferences(prefs)
 	_ = SavePreferences()
-}
-
-func AllowQuitCallback() bool {
-	mainWindow.AttemptClose()
-	return true
 }
